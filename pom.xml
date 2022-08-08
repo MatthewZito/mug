@@ -30,7 +30,7 @@
 				<scope>import</scope>
 			</dependency>
 		</dependencies>
-	</dependencyManagement> 
+	</dependencyManagement>
 
   <dependencies>
     <dependency>
@@ -42,8 +42,8 @@
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
-      <version>2.8.9</version>  
-    </dependency> 
+      <version>2.8.9</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -67,7 +67,7 @@
           <artifactId>maven-surefire-plugin</artifactId>
           <version>2.22.1</version>
         </plugin>
-        
+
         <plugin>
           <artifactId>maven-install-plugin</artifactId>
           <version>2.5.2</version>
@@ -89,7 +89,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-checkstyle-plugin</artifactId>
-          <version>3.1.2</version> 
+          <version>3.1.2</version>
           <executions>
             <execution>
               <id>checkstyle</id>
@@ -106,7 +106,25 @@
             <violationSeverity>warning</violationSeverity>
             <includeTestSourceDirectory>true</includeTestSourceDirectory>
           </configuration>
-        </plugin> 
+          <dependencies>
+            <dependency>
+                <groupId>com.puppycrawl.tools</groupId>
+                <artifactId>checkstyle</artifactId>
+                <version>9.2</version>
+            </dependency>
+          </dependencies>
+        </plugin>
+
+        <plugin>
+          <groupId>org.openrewrite.maven</groupId>
+          <artifactId>rewrite-maven-plugin</artifactId>
+          <version>4.31.1</version>
+          <configuration>
+            <activeRecipes>
+              <recipe>org.openrewrite.java.cleanup.Cleanup</recipe>
+            </activeRecipes>
+          </configuration>
+        </plugin>
 
         <plugin>
           <groupId>com.hubspot.maven.plugins</groupId>
@@ -136,7 +154,7 @@
           </executions>
         </plugin>
       </plugins>
- 
+
     </pluginManagement>
 
     <plugins>
@@ -161,7 +179,7 @@
           </descriptorRefs>
         </configuration>
       </plugin>
-      
+
       <plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>3.0.0-M6</version>
@@ -169,7 +187,7 @@
     </plugins>
   </build>
 
-   <reporting>
+  <reporting>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
