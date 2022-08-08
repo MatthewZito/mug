@@ -18,5 +18,4 @@ public class Api {
   public void createRoute(String path, HttpHandler handler) {
     this.instance.createContext(path, handler);
   }
-
 }

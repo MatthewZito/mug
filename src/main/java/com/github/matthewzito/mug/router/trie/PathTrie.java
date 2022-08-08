@@ -7,6 +7,8 @@ import java.util.regex.Pattern;
 import com.github.matthewzito.mug.router.cache.RegexCache;
 import com.github.matthewzito.mug.router.constant.Method;
 import com.github.matthewzito.mug.router.constant.Path;
+import com.github.matthewzito.mug.router.errors.MethodNotAllowedException;
+import com.github.matthewzito.mug.router.errors.NotFoundException;
 import com.github.matthewzito.mug.router.utils.PathUtils;
 import com.sun.net.httpserver.HttpHandler;
 
@@ -28,7 +30,7 @@ public class PathTrie {
 
   /**
    * Insert a new route record into the PathTrie.
-   * 
+   *
    * @param methods A list of the HTTP methods to which the handler should be
    *                correlated.
    * @param path    The path at which this record will match.
@@ -51,8 +53,6 @@ public class PathTrie {
 
     ArrayList<String> paths = PathUtils.expandPath(path);
     for (int i = 0; i < paths.size(); i++) {
-
-      // @todo cache/hoist
       PathTrieNode next = curr.children.get(paths.get(i));
       if (next != null) {
         curr = next;
@@ -77,7 +77,6 @@ public class PathTrie {
 
   }
 
-  // @todo custom Exception
   public SearchResult search(Method method, String searchPath) throws Exception {
     ArrayList<Parameter> params = new ArrayList<>();
 
@@ -93,7 +92,7 @@ public class PathTrie {
 
       if (curr.children.size() == 0) {
         if (!path.equals(curr.label)) {
-          throw new Exception("No matching route result found");
+          throw new NotFoundException("No matching route result found");
         }
         break;
       }
@@ -117,13 +116,13 @@ public class PathTrie {
           }
 
           // No parameter match.
-          throw new Exception("No parameter match");
+          throw new NotFoundException("No parameter match");
         }
       }
 
       // No parameter match.
       if (!isParamMatch) {
-        throw new Exception("No parameter match");
+        throw new NotFoundException("No parameter match");
 
       }
     }
@@ -131,14 +130,14 @@ public class PathTrie {
     if (Path.PATH_ROOT.equals(searchPath)) {
       // No matching handler.
       if (curr.actions.size() == 0) {
-        throw new Exception("No matching handler");
+        throw new NotFoundException("No matching handler");
       }
     }
 
     Action matchedAction = curr.actions.get(method);
     // No matching handler.
     if (matchedAction == null) {
-      throw new Exception("No matching handler");
+      throw new MethodNotAllowedException("No matching handler");
     }
 
     SearchResult result = new SearchResult(matchedAction, params);
