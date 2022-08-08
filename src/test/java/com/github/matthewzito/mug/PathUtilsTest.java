@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.TestFactory;
 
 import com.github.matthewzito.mug.router.utils.PathUtils;
 import com.github.matthewzito.mug.utils.TestUtils;

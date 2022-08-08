@@ -1,8 +1,7 @@
 package com.github.matthewzito.mug.router.utils;
 
-import java.util.ArrayList;
-
 import com.github.matthewzito.mug.router.constant.Path;
+import java.util.ArrayList;
 
 public class PathUtils {
   public static ArrayList<String> expandPath(String path) {
@@ -21,7 +20,7 @@ public class PathUtils {
    * Derives from a given label a regex pattern.
    * e.g. :id[^\d+$] => ^\d+$
    * e.g. :id => (.+)
-   * 
+   *
    * @param label A label from which to derive a regular expression pattern.
    * @return The derived regular expression pattern.
    */
@@ -41,7 +40,7 @@ public class PathUtils {
    * Derives from a given label a regex pattern's key.
    * e.g. :id[^\d+$] → id
    * e.g. :id → id
-   * 
+   *
    * @param label A string entity that represents a key/value pattern pair.
    * @return The key of the given pattern.
    */
@@ -54,5 +53,8 @@ public class PathUtils {
     }
 
     return label.substring(start + 1, end);
+  }
+
+  private PathUtils() {
   }
 }

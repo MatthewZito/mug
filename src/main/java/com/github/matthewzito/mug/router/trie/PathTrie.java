@@ -1,9 +1,5 @@
 package com.github.matthewzito.mug.router.trie;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.regex.Pattern;
-
 import com.github.matthewzito.mug.router.cache.RegexCache;
 import com.github.matthewzito.mug.router.constant.Method;
 import com.github.matthewzito.mug.router.constant.Path;
@@ -11,6 +7,9 @@ import com.github.matthewzito.mug.router.errors.MethodNotAllowedException;
 import com.github.matthewzito.mug.router.errors.NotFoundException;
 import com.github.matthewzito.mug.router.utils.PathUtils;
 import com.sun.net.httpserver.HttpHandler;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.regex.Pattern;
 
 public class PathTrie {
   public static record Parameter(String key, String value) {

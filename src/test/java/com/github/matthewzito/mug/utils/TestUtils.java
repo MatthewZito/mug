@@ -14,4 +14,7 @@ public class TestUtils {
     return list;
   }
 
+  private TestUtils() {
+  }
+
 }

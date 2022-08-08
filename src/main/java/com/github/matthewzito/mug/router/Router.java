@@ -1,8 +1,5 @@
 package com.github.matthewzito.mug.router;
 
-import java.io.IOException;
-import java.util.ArrayList;
-
 import com.github.matthewzito.mug.router.constant.Method;
 import com.github.matthewzito.mug.router.errors.MethodNotAllowedException;
 import com.github.matthewzito.mug.router.errors.NotFoundException;
@@ -10,13 +7,15 @@ import com.github.matthewzito.mug.router.trie.Action;
 import com.github.matthewzito.mug.router.trie.PathTrie;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import java.io.IOException;
+import java.util.ArrayList;
 
 public class Router implements HttpHandler {
-  private HttpHandler notFoundHandler = (exchange) -> {
+  private HttpHandler notFoundHandler = exchange -> {
     exchange.sendResponseHeaders(404, -1);
   };
 
-  private HttpHandler methodNotAllowedHandler = (exchange) -> {
+  private HttpHandler methodNotAllowedHandler = exchange -> {
     exchange.sendResponseHeaders(405, -1);
   };
 
