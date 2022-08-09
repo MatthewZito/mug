@@ -34,16 +34,16 @@
 
   <dependencies>
     <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>4.6.1</version>
+    </dependency>
+
+    <dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter</artifactId>
 			<scope>test</scope>
 		</dependency>
-
-    <dependency>
-      <groupId>com.google.code.gson</groupId>
-      <artifactId>gson</artifactId>
-      <version>2.8.9</version>
-    </dependency>
   </dependencies>
 
   <build>
@@ -105,6 +105,8 @@
             <enableFilesSummary>true</enableFilesSummary>
             <violationSeverity>warning</violationSeverity>
             <includeTestSourceDirectory>true</includeTestSourceDirectory>
+            <suppressionsLocation>checkstyle-suppressions.xml</suppressionsLocation>
+            <suppressionsFileExpression>checkstyle.suppressions.file</suppressionsFileExpression>
           </configuration>
           <dependencies>
             <dependency>
@@ -132,7 +134,7 @@
           <version>0.16</version>
           <configuration>
             <prettierJavaVersion>1.5.0</prettierJavaVersion>
-            <printWidth>90</printWidth>
+            <printWidth>120</printWidth>
             <tabWidth>2</tabWidth>
             <useTabs>false</useTabs>
             <ignoreConfigFile>true</ignoreConfigFile>
@@ -171,7 +173,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>com.github.matthewzito.mug.App</mainClass>
+              <mainClass>com.github.matthewzito.mug.example.App</mainClass>
             </manifest>
           </archive>
           <descriptorRefs>
@@ -206,6 +208,8 @@
           <enableFilesSummary>true</enableFilesSummary>
           <violationSeverity>warning</violationSeverity>
           <includeTestSourceDirectory>true</includeTestSourceDirectory>
+          <suppressionsLocation>checkstyle-suppressions.xml</suppressionsLocation>
+          <suppressionsFileExpression>checkstyle.suppressions.file</suppressionsFileExpression>
         </configuration>
       </plugin>
     </plugins>

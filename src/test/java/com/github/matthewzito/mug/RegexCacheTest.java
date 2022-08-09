@@ -3,10 +3,9 @@ package com.github.matthewzito.mug;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+import com.github.matthewzito.mug.router.cache.RegexCache;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import com.github.matthewzito.mug.router.cache.RegexCache;
 
 class RegexCacheTest {
 

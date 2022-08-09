@@ -1,12 +1,9 @@
 package com.github.matthewzito.mug.router.constant;
 
+/**
+ * Common HTTP methods, as defined in RFC 7231 section 4.3 (unless otherwise noted).
+ */
 public enum Method {
-  GET,
-  PUT,
-  POST,
-  PATCH,
-  TRACE,
-  HEAD,
-  DELETE,
-  OPTIONS
+  GET, HEAD, POST, PUT, PATCH, // RFC 5789
+  DELETE, CONNECT, OPTIONS, TRACE,
 }

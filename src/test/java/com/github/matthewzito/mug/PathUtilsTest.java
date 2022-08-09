@@ -2,20 +2,19 @@ package com.github.matthewzito.mug;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.github.matthewzito.mug.router.utils.PathUtils;
+import com.github.matthewzito.mug.utils.TestUtils;
 import java.util.ArrayList;
 import java.util.stream.Stream;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
-
-import com.github.matthewzito.mug.router.utils.PathUtils;
-import com.github.matthewzito.mug.utils.TestUtils;
 
 /**
  * Unit tests for PathUtils.
  */
 @DisplayName("Test path utilities")
+@SuppressWarnings("checkstyle:MethodParamPad")
 class PathUtilsTest {
   static record TestCase<T> (String name, String input, T expected) {
 

@@ -3,7 +3,16 @@ package com.github.matthewzito.mug.router.utils;
 import com.github.matthewzito.mug.router.constant.Path;
 import java.util.ArrayList;
 
+/**
+ * Shared path utilities.
+ */
 public class PathUtils {
+  /**
+   * Expands a path into a list of paths separated by `Path.PATH_DELIMITER`.
+   *
+   * @param path A path, possibly delimited by the `Path.PATH_DELIMITER`.
+   * @return A list of paths, delimited by `Path.PATH_DELIMITER`.
+   */
   public static ArrayList<String> expandPath(String path) {
     ArrayList<String> r = new ArrayList<>();
 
@@ -18,15 +27,17 @@ public class PathUtils {
 
   /**
    * Derives from a given label a regex pattern.
-   * e.g. :id[^\d+$] => ^\d+$
-   * e.g. :id => (.+)
+   *
+   * <p>
+   * e.g. :id[^\d+$] => ^\d+$ e.g. :id => (.+)
+   * </p>
    *
    * @param label A label from which to derive a regular expression pattern.
    * @return The derived regular expression pattern.
    */
   public static String deriveLabelPattern(String label) {
-    int start = label.indexOf(Path.PATTERN_DELIMITER_START.value);
-    int end = label.indexOf(Path.PATTERN_DELIMITER_END.value);
+    int start = label.indexOf(Path.PATTERN_START.value);
+    int end = label.indexOf(Path.PATTERN_END.value);
 
     // If the label doesn't contain a pattern, default to the wildcard pattern.
     if (start == -1 || end == -1) {
@@ -38,15 +49,17 @@ public class PathUtils {
 
   /**
    * Derives from a given label a regex pattern's key.
-   * e.g. :id[^\d+$] → id
-   * e.g. :id → id
+   *
+   * <p>
+   * e.g. :id[^\d+$] → id e.g. :id → id
+   * </p>
    *
    * @param label A string entity that represents a key/value pattern pair.
    * @return The key of the given pattern.
    */
   public static String deriveParameterKey(String label) {
     int start = label.indexOf(Path.PARAMETER_DELIMITER.value);
-    int end = label.indexOf(Path.PATTERN_DELIMITER_START.value);
+    int end = label.indexOf(Path.PATTERN_START.value);
 
     if (end == -1) {
       end = label.length();
@@ -55,6 +68,5 @@ public class PathUtils {
     return label.substring(start + 1, end);
   }
 
-  private PathUtils() {
-  }
+  private PathUtils() {}
 }

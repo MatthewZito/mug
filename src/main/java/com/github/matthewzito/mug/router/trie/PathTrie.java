@@ -5,21 +5,26 @@ import com.github.matthewzito.mug.router.constant.Method;
 import com.github.matthewzito.mug.router.constant.Path;
 import com.github.matthewzito.mug.router.errors.MethodNotAllowedException;
 import com.github.matthewzito.mug.router.errors.NotFoundException;
+import com.github.matthewzito.mug.router.middleware.Middleware;
 import com.github.matthewzito.mug.router.utils.PathUtils;
 import com.sun.net.httpserver.HttpHandler;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 
+/**
+ * A trie data structure used to resolve paths to their corresponding route records.
+ */
 public class PathTrie {
-  public static record Parameter(String key, String value) {
-  }
 
-  public static record SearchResult(Action action, ArrayList<Parameter> parameters) {
-  }
-
+  /**
+   * The trie root node. This should be the `Path.PATH_ROOT`.
+   */
   private PathTrieNode root;
 
+  /**
+   * A cache for compiled regular expression matchers.
+   */
   private RegexCache cache;
 
   public PathTrie() {
@@ -30,19 +35,18 @@ public class PathTrie {
   /**
    * Insert a new route record into the PathTrie.
    *
-   * @param methods A list of the HTTP methods to which the handler should be
-   *                correlated.
-   * @param path    The path at which this record will match.
-   * @param handler The HttpHandler function to be invoked upon a routing match to
-   *                the given path `path`.
+   * @param methods A list of the HTTP methods to which the handler should be correlated.
+   * @param path The path at which this record will match.
+   * @param handler The HttpHandler function to be invoked upon a routing match to the given path
+   *        `path`.
    */
-  public void insert(ArrayList<Method> methods, String path, HttpHandler handler) {
+  public void insert(ArrayList<Method> methods, String path, HttpHandler handler,
+      ArrayList<Middleware> middlewares) {
     // Handle root path registration.
-    if (path == Path.PATH_ROOT.value) {
+    if (Path.PATH_ROOT.value.equals(path)) {
       this.root.label = path;
-
-      methods.forEach((method) -> {
-        this.root.actions.put(method, new Action(handler));
+      methods.forEach(method -> {
+        this.root.actions.put(method, new Action(handler, middlewares));
       });
 
       return;
@@ -67,7 +71,7 @@ public class PathTrie {
         curr.label = paths.get(i);
 
         for (Method method : methods) {
-          curr.actions.put(method, new Action(handler));
+          curr.actions.put(method, new Action(handler, middlewares));
         }
 
         break;
@@ -76,7 +80,18 @@ public class PathTrie {
 
   }
 
-  public SearchResult search(Method method, String searchPath) throws Exception {
+  /**
+   * Search for a route record at the provided HTTP method and search path.
+   *
+   * @param method The HTTP method for the matching route record.
+   * @param searchPath The path to search.
+   * @return A SearchResult record containing the matched route handler and any matching parameters.
+   * @throws NotFoundException A route match was not found.
+   * @throws MethodNotAllowedException A route match was found, but not for the specified HTTP
+   *         method.
+   */
+  public SearchResult search(Method method, String searchPath)
+      throws NotFoundException, MethodNotAllowedException {
     ArrayList<Parameter> params = new ArrayList<>();
 
     PathTrieNode curr = this.root;
