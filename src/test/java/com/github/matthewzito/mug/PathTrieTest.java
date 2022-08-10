@@ -7,8 +7,8 @@ import static com.github.matthewzito.mug.utils.TestUtils.toList;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.github.matthewzito.mug.router.constant.Method;
-import com.github.matthewzito.mug.router.constant.Path;
+import com.github.matthewzito.mug.constant.Method;
+import com.github.matthewzito.mug.constant.Path;
 import com.github.matthewzito.mug.router.middleware.Middleware;
 import com.github.matthewzito.mug.router.trie.Action;
 import com.github.matthewzito.mug.router.trie.Parameter;
@@ -42,9 +42,9 @@ class PathTrieTest {
     };
 
     ArrayList<RouteRecord> records = toList(
-        new RouteRecord(Path.PATH_ROOT.value, toList(Method.GET),
+        new RouteRecord(Path.ROOT.value, toList(Method.GET),
             testHandler),
-        new RouteRecord(Path.PATH_ROOT.value, toList(Method.GET,
+        new RouteRecord(Path.ROOT.value, toList(Method.GET,
             Method.POST), testHandler),
         new RouteRecord("/test", toList(Method.GET), testHandler),
         new RouteRecord("/test/path", toList(Method.GET), testHandler),
@@ -61,7 +61,8 @@ class PathTrieTest {
           record.path(),
           record.handler(),
           new ArrayList<>()),
-          String.format("Unexpected exception thrown when inserting a route record with path %s",
+          String.format(
+              "Unexpected exception thrown when inserting a route record with path %s",
               record.path()));
     }
   }
@@ -73,7 +74,7 @@ class PathTrieTest {
     };
 
     ArrayList<RouteRecord> records = toList(
-        new RouteRecord(Path.PATH_ROOT.value, toList(Method.GET),
+        new RouteRecord(Path.ROOT.value, toList(Method.GET),
             testHandler),
         new RouteRecord("/test", toList(Method.GET), testHandler),
         new RouteRecord("/test/path", toList(Method.GET), testHandler),

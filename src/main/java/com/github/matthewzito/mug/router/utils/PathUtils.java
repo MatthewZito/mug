@@ -1,6 +1,6 @@
 package com.github.matthewzito.mug.router.utils;
 
-import com.github.matthewzito.mug.router.constant.Path;
+import com.github.matthewzito.mug.constant.Path;
 import java.util.ArrayList;
 
 /**

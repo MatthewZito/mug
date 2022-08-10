@@ -23,7 +23,7 @@ public class RegexCache {
    * @param pattern A string pattern and valid regular expression.
    * @return A compiled regex Pattern.
    */
-  public Pattern get(String pattern) {
+  public synchronized Pattern get(String pattern) {
     Pattern regex = this.state.get(pattern);
     if (regex != null) {
       return regex;

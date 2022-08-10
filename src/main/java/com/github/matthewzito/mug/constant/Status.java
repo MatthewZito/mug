@@ -1,4 +1,4 @@
-package com.github.matthewzito.mug.router.constant;
+package com.github.matthewzito.mug.constant;
 
 /**
  * HTTP status codes as registered with IANA.

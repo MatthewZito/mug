@@ -5,8 +5,7 @@
      "https://checkstyle.org/dtds/suppressions_1_0.dtd">
 
 <suppressions>
-  <suppress files="App.java" checks="[a-zA-Z0-9]*"/>
-  <suppress files="TestRoute.java" checks="[a-zA-Z0-9]*"/>
+  <suppress files="[\\/]example[\\/]" checks="[a-zA-Z0-9]*"/>
   <suppress checks="MethodParamPad"
              files="TestUtils.java"
              lines="35,36"/>

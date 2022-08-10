@@ -3,9 +3,9 @@ package com.github.matthewzito.mug.utils;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.github.matthewzito.mug.constant.Method;
 import com.github.matthewzito.mug.router.Router;
 import com.github.matthewzito.mug.router.annotations.Route;
-import com.github.matthewzito.mug.router.constant.Method;
 import com.github.matthewzito.mug.router.trie.PathTrie;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;

@@ -1,4 +1,4 @@
-package com.github.matthewzito.mug.router.constant;
+package com.github.matthewzito.mug.constant;
 
 /**
  * Path constants for use with a PathTrie.
@@ -7,7 +7,7 @@ public enum Path {
   /**
    * The root path.
    */
-  PATH_ROOT("/"),
+  ROOT("/"),
 
   /**
    * The character used to demarcate paths.

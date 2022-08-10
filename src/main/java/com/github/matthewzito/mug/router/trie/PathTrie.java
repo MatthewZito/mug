@@ -1,8 +1,8 @@
 package com.github.matthewzito.mug.router.trie;
 
+import com.github.matthewzito.mug.constant.Method;
+import com.github.matthewzito.mug.constant.Path;
 import com.github.matthewzito.mug.router.cache.RegexCache;
-import com.github.matthewzito.mug.router.constant.Method;
-import com.github.matthewzito.mug.router.constant.Path;
 import com.github.matthewzito.mug.router.errors.MethodNotAllowedException;
 import com.github.matthewzito.mug.router.errors.NotFoundException;
 import com.github.matthewzito.mug.router.middleware.Middleware;
@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 public class PathTrie {
 
   /**
-   * The trie root node. This should be the `Path.PATH_ROOT`.
+   * The trie root node. This should be the `Path.ROOT`.
    */
   private PathTrieNode root;
 
@@ -43,7 +43,7 @@ public class PathTrie {
   public void insert(ArrayList<Method> methods, String path, HttpHandler handler,
       ArrayList<Middleware> middlewares) {
     // Handle root path registration.
-    if (Path.PATH_ROOT.value.equals(path)) {
+    if (Path.ROOT.value.equals(path)) {
       this.root.label = path;
       methods.forEach(method -> {
         this.root.actions.put(method, new Action(handler, middlewares));
@@ -141,7 +141,7 @@ public class PathTrie {
       }
     }
 
-    if (Path.PATH_ROOT.equals(searchPath)) {
+    if (Path.ROOT.equals(searchPath)) {
       // No matching handler.
       if (curr.actions.size() == 0) {
         throw new NotFoundException("No matching handler");

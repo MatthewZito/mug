@@ -1,8 +1,8 @@
 package com.github.matthewzito.mug.router;
 
+import com.github.matthewzito.mug.constant.Method;
+import com.github.matthewzito.mug.constant.Status;
 import com.github.matthewzito.mug.router.annotations.Route;
-import com.github.matthewzito.mug.router.constant.Method;
-import com.github.matthewzito.mug.router.constant.Status;
 import com.github.matthewzito.mug.router.errors.InvalidRouteClassException;
 import com.github.matthewzito.mug.router.errors.MethodNotAllowedException;
 import com.github.matthewzito.mug.router.errors.NotFoundException;

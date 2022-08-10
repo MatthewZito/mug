@@ -1,8 +1,9 @@
 package com.github.matthewzito.mug.example;
 
+import com.github.matthewzito.mug.constant.Method;
+import com.github.matthewzito.mug.constant.Status;
+import com.github.matthewzito.mug.cors.Cors;
 import com.github.matthewzito.mug.router.Router;
-import com.github.matthewzito.mug.router.constant.Method;
-import com.github.matthewzito.mug.router.constant.Status;
 import com.github.matthewzito.mug.router.middleware.Middleware;
 import com.github.matthewzito.mug.server.Server;
 import com.sun.net.httpserver.HttpHandler;
@@ -15,51 +16,35 @@ public class App {
   private static final int PORT = 5000;
 
   public static void main(String[] args) {
-    HttpHandler apiHandler = exchange -> {
+    // Middleware mw = new Middleware() {
+    // @Override
+    // public HttpHandler handle(HttpHandler handler) {
+    // return exchange -> {
+    // System.out.println("before");
+    // handler.handle(exchange);
+    // System.out.println("after");
+    // };
+    // }
+    // };
 
-      System.out.println(exchange.getRequestMethod());
-
-      String rs = "HELLO";
-      byte[] responseBytes = rs.getBytes();
-      exchange.sendResponseHeaders(Status.OK.value, responseBytes.length);
-      OutputStream output = exchange.getResponseBody();
-      output.write(responseBytes);
-      output.flush();
-    };
-
-    Middleware mw = new Middleware() {
-      @Override
-      public HttpHandler handle(HttpHandler handler) {
-        return exchange -> {
-          System.out.println("before");
-          handler.handle(exchange);
-          System.out.println("after");
-        };
-      }
-    };
-
-    Middleware mw2 = new Middleware() {
-      @Override
-      public HttpHandler handle(HttpHandler handler) {
-        return exchange -> {
-          System.out.println("before2");
-          handler.handle(exchange);
-          System.out.println("after2");
-        };
-      }
-    };
+    // Middleware mw2 = new Middleware() {
+    // @Override
+    // public HttpHandler handle(HttpHandler handler) {
+    // return exchange -> {
+    // System.out.println("before2");
+    // handler.handle(exchange);
+    // System.out.println("after2");
+    // };
+    // }
+    // };
 
     Router router = new Router();
 
-    router.register(new ArrayList<>(
-        Arrays.asList(Method.GET)),
-        "/api",
-        apiHandler,
-        new ArrayList<Middleware>(Arrays.asList(mw, mw2)));
-
-    router.use(TestRoute.class);
+    router.use(Routes.class);
 
     try {
+      // Cors cors = new Cors(true);
+
       Server server = new Server(PORT, router);
 
       server.withAuthentication(

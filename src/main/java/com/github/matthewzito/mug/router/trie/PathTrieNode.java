@@ -1,6 +1,6 @@
 package com.github.matthewzito.mug.router.trie;
 
-import com.github.matthewzito.mug.router.constant.Method;
+import com.github.matthewzito.mug.constant.Method;
 import java.util.Map;
 
 /**

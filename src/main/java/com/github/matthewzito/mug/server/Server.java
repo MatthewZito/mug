@@ -1,10 +1,12 @@
 package com.github.matthewzito.mug.server;
 
+import com.github.matthewzito.mug.constant.Path;
 import com.github.matthewzito.mug.router.Router;
 import com.github.matthewzito.mug.router.middleware.AuthenticationMiddleware;
 import com.sun.net.httpserver.Filter;
 import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -29,13 +31,13 @@ public class Server {
    * Constructor. Initialize a new server.
    *
    * @param port The port number at which the server will listen.
-   * @param router The Router instance to register.
+   * @param rootHandler The root HttpHandler to register.
    * @throws IOException Server initialization failed.
    */
-  public Server(int port, Router router) throws IOException {
+  public Server(int port, HttpHandler rootHandler) throws IOException {
     this.instance = HttpServer.create(new InetSocketAddress(port), 0);
 
-    this.ctx = this.instance.createContext("/", router);
+    this.ctx = this.instance.createContext(Path.ROOT.value, rootHandler);
   }
 
   /**

@@ -1,6 +1,6 @@
 package com.github.matthewzito.mug.router.annotations;
 
-import com.github.matthewzito.mug.router.constant.Method;
+import com.github.matthewzito.mug.constant.Method;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
