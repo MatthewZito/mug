@@ -16,28 +16,6 @@ public class App {
   private static final int PORT = 5000;
 
   public static void main(String[] args) {
-    // Middleware mw = new Middleware() {
-    // @Override
-    // public HttpHandler handle(HttpHandler handler) {
-    // return exchange -> {
-    // System.out.println("before");
-    // handler.handle(exchange);
-    // System.out.println("after");
-    // };
-    // }
-    // };
-
-    // Middleware mw2 = new Middleware() {
-    // @Override
-    // public HttpHandler handle(HttpHandler handler) {
-    // return exchange -> {
-    // System.out.println("before2");
-    // handler.handle(exchange);
-    // System.out.println("after2");
-    // };
-    // }
-    // };
-
     Router router = new Router();
 
     router.use(Routes.class);

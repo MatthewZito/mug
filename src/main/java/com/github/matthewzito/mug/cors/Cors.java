@@ -2,6 +2,7 @@ package com.github.matthewzito.mug.cors;
 
 import com.github.matthewzito.mug.constant.Method;
 import com.github.matthewzito.mug.constant.Status;
+import com.github.matthewzito.mug.utils.NullSafe;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -15,33 +16,28 @@ public class Cors {
   /**
    * A list of allowed origins for CORS requests.
    */
-  public ArrayList<String> allowedOrigins;
+  public final ArrayList<String> allowedOrigins = new ArrayList<>();
 
   /**
    * A list of allowed HTTP methods for CORS requests.
    */
-  public ArrayList<String> allowedMethods;
+  public final ArrayList<String> allowedMethods = new ArrayList<>();
 
   /**
    * A list of allowed non-simple headers for CORS requests.
    */
-  public ArrayList<String> allowedHeaders;
+  public final ArrayList<String> allowedHeaders = new ArrayList<>();
+
+  /**
+   * A list of non-simple headers that may be exposed to clients making CORS requests.
+   */
+  public final ArrayList<String> exposedHeaders;
 
   /**
    * A flag indicating whether the request may include Cookies.
    */
   public boolean allowCredentials;
 
-  /**
-   * The suggested duration, in seconds, that a response should remain in the browser's cache before
-   * another Preflight request is made.
-   */
-  public int maxAge;
-
-  /**
-   * A list of non-simple headers that may be exposed to clients making CORS requests.
-   */
-  public ArrayList<String> exposedHeaders;
 
   /**
    * A flag indicating whether all origins should be allowed for CORS requests. If `allowedOrigins
@@ -63,6 +59,12 @@ public class Cors {
   public boolean useOptionsPassthrough;
 
   /**
+   * The suggested duration, in seconds, that a response should remain in the browser's cache before
+   * another Preflight request is made.
+   */
+  public int maxAge;
+
+  /**
    * Initialize CORS middleware with the provided configurations.
    *
    * @param allowedOrigins A list of allowed origins for CORS requests.
@@ -78,14 +80,15 @@ public class Cors {
    * @param exposeHeaders A list of non-simple headers that may be exposed to clients making CORS
    *        requests.
    */
-  public Cors(
-      ArrayList<String> allowedOrigins,
-      ArrayList<String> allowedMethods,
-      ArrayList<String> allowedHeaders,
-      boolean allowCredentials,
-      boolean useOptionsPassthrough,
-      int maxAge,
-      ArrayList<String> exposeHeaders) {
+  public Cors(CorsOptions options) {
+    ArrayList<String> allowedOrigins = options.allowedOrigins();
+    ArrayList<Method> allowedMethods = options.allowedMethods();
+    ArrayList<String> allowedHeaders = options.allowedHeaders();
+
+    this.allowCredentials = options.allowCredentials();
+    this.useOptionsPassthrough = options.useOptionsPassthrough();
+    this.maxAge = options.maxAge();
+    this.exposedHeaders = options.exposeHeaders();
 
     // Register origins: if no given origins, default to allow all e.g. "*".
     if (allowedOrigins.size() == 0) {
@@ -113,7 +116,7 @@ public class Cors {
     // Although these headers are allowed by default, we add them anyway for the sake of
     // consistency.
     if (allowedHeaders.size() == 0) {
-      this.allowedHeaders = Defaults.defaultAllowedHeaders;
+      this.allowedHeaders.addAll(Defaults.defaultAllowedHeaders);
     } else {
       for (String header : allowedHeaders) {
         header = header.toLowerCase();
@@ -128,10 +131,10 @@ public class Cors {
     }
 
     if (allowedMethods.size() == 0) {
-      this.allowedMethods = Defaults.defaultAllowedMethods;
+      this.allowedMethods.addAll(Defaults.defaultAllowedMethods);
     } else {
-      for (String method : allowedMethods) {
-        this.allowedMethods.add(method.toUpperCase());
+      for (Method method : allowedMethods) {
+        this.allowedMethods.add(method.toString());
       }
     }
   }
@@ -152,9 +155,9 @@ public class Cors {
         if (this.useOptionsPassthrough) {
           handler.handle(exchange);
           return;
-        } else {
-          exchange.sendResponseHeaders(Status.NO_CONTENT.value, -1);
         }
+
+        exchange.sendResponseHeaders(Status.NO_CONTENT.value, -1);
       } else {
         this.handleRequest(exchange);
       }
@@ -169,7 +172,7 @@ public class Cors {
    * @param origin The request origin.
    * @return A boolean indicating whether the origin is allowed per the CORS impl.
    */
-  private boolean isOriginAllowed(String origin) {
+  protected boolean isOriginAllowed(String origin) {
     if (this.allowAllOrigins) {
       return true;
     }
@@ -191,12 +194,12 @@ public class Cors {
    * @param method The request method.
    * @return A boolean indicating whether the method is allowed per the CORS impl.
    */
-  private boolean isMethodAllowed(String method) {
+  protected boolean isMethodAllowed(String method) {
     if (this.allowedMethods.size() == 0) {
       return false;
     }
 
-    method = method.toLowerCase();
+    method = method.toUpperCase();
     if (Method.OPTIONS.toString().equals(method)) {
       return true;
     }
@@ -217,7 +220,7 @@ public class Cors {
    *        Access-Control-Request-Headers header.
    * @return A boolean indicating whether the headers are allowed per the CORS impl.
    */
-  private boolean areHeadersAllowed(ArrayList<String> headers) {
+  protected boolean areHeadersAllowed(ArrayList<String> headers) {
     if (this.allowAllHeaders || headers.size() == 0) {
       return true;
     }
@@ -247,15 +250,16 @@ public class Cors {
    * @param exchange The HttpExchange containing the Preflight request.
    */
   private void handlePreflightRequest(HttpExchange exchange) {
-    Headers headers = exchange.getRequestHeaders();
+    Headers reqHeaders = exchange.getRequestHeaders();
+    Headers resHeaders = exchange.getResponseHeaders();
 
     // Set the "vary" header to prevent proxy servers from sending cached responses for one client
     // to another.
-    headers.add(CommonHeader.VARY.value, CommonHeader.ORIGIN.value);
-    headers.add(CommonHeader.VARY.value, CommonHeader.REQUEST_METHOD.value);
-    headers.add(CommonHeader.VARY.value, CommonHeader.REQUEST_HEADERS.value);
+    resHeaders.add(CommonHeader.VARY.value, CommonHeader.ORIGIN.value);
+    resHeaders.add(CommonHeader.VARY.value, CommonHeader.REQUEST_METHOD.value);
+    resHeaders.add(CommonHeader.VARY.value, CommonHeader.REQUEST_HEADERS.value);
 
-    String origin = headers.getFirst(CommonHeader.ORIGIN.value);
+    String origin = NullSafe.getFirst(reqHeaders, CommonHeader.ORIGIN.value);
     // If no origin was specified, this is not a valid CORS request.
     if (origin == null || "".equals(origin)) {
       return;
@@ -269,7 +273,7 @@ public class Cors {
 
 
     // Validate the method; this is the crux of the Preflight.
-    String requestMethod = headers.getFirst(CommonHeader.REQUEST_METHOD.value);
+    String requestMethod = NullSafe.getFirst(reqHeaders, CommonHeader.REQUEST_METHOD.value);
 
     if (!this.isMethodAllowed(requestMethod)) {
       return;
@@ -284,34 +288,34 @@ public class Cors {
 
     if (this.allowAllOrigins) {
       // If all origins are allowed, use the wildcard value.
-      headers.set(CommonHeader.ALLOW_ORIGINS.value, "*");
+      resHeaders.set(CommonHeader.ALLOW_ORIGINS.value, "*");
     } else {
       // Otherwise, set the origin to the request origin.
-      headers.set(CommonHeader.ALLOW_ORIGINS.value, origin);
+      resHeaders.set(CommonHeader.ALLOW_ORIGINS.value, origin);
     }
 
     // Set the allowed methods, as a Preflight may have been sent if the client included non-simple
     // methods.
-    headers.set(CommonHeader.ALLOW_METHODS.value, requestMethod);
+    resHeaders.set(CommonHeader.ALLOW_METHODS.value, requestMethod);
 
     // Set the allowed headers, as a Preflight may have been sent if the client included non-simple
     // headers.
     if (requestHeaders.size() > 0) {
-      headers.set(CommonHeader.ALLOW_HEADERS.value, this.allowedHeaders.stream().collect(
-          Collectors.joining(",")));
+      resHeaders.set(CommonHeader.ALLOW_HEADERS.value, this.allowedHeaders.stream().collect(
+          Collectors.joining(", ")));
     }
 
     // Allow the client to send credentials. If making an XHR request, the client must set
     // `withCredentials` to `true`.
     if (this.allowCredentials) {
-      headers.set(CommonHeader.ALLOW_CREDENTIALS.value, "true");
+      resHeaders.set(CommonHeader.ALLOW_CREDENTIALS.value, "true");
     }
 
     // Set the Max Age. This is only necessary for Preflights given the Max Age refers to
     // server-suggested duration, in seconds, a response should stay in the browser's cache before
     // another Preflight is made.
     if (this.maxAge > 0) {
-      headers.set(CommonHeader.MAX_AGE.value, String.valueOf(this.maxAge));
+      resHeaders.set(CommonHeader.MAX_AGE.value, String.valueOf(this.maxAge));
     }
   }
 
@@ -321,14 +325,14 @@ public class Cors {
    * @param exchange The HttpExchange containing the non-Preflight CORS request.
    */
   private void handleRequest(HttpExchange exchange) {
-    Headers headers = exchange.getRequestHeaders();
-    String origin = headers.getFirst(CommonHeader.ORIGIN.value);
+    Headers reqHeaders = exchange.getRequestHeaders();
+    Headers resHeaders = exchange.getResponseHeaders();
+    String origin = NullSafe.getFirst(reqHeaders, CommonHeader.ORIGIN.value);
 
 
     // Set the "vary" header to prevent proxy servers from sending cached responses for one client
     // to another.
-    headers.add(CommonHeader.VARY.value, CommonHeader.ORIGIN.value);
-
+    resHeaders.add(CommonHeader.VARY.value, CommonHeader.ORIGIN.value);
 
     // If no origin was specified, this is not a valid CORS request.
     if (origin == null || "".equals(origin)) {
@@ -344,24 +348,24 @@ public class Cors {
 
     if (this.allowAllOrigins) {
       // If all origins are allowed, use the wildcard value.
-      headers.set(CommonHeader.ALLOW_ORIGINS.value, "*");
+      resHeaders.set(CommonHeader.ALLOW_ORIGINS.value, "*");
     } else {
       // Otherwise, set the origin to the request origin.
-      headers.set(CommonHeader.ALLOW_ORIGINS.value, origin);
+      resHeaders.set(CommonHeader.ALLOW_ORIGINS.value, origin);
     }
 
     // If we've exposed headers, set them.
     // If the consumer specified headers that are exposed by default, we'll still include them -
     // this is spec compliant.
     if (this.exposedHeaders.size() > 0) {
-      headers.set(CommonHeader.EXPOSE_HEADERS.value, this.exposedHeaders.stream().collect(
-          Collectors.joining(",")));
+      resHeaders.set(CommonHeader.EXPOSE_HEADERS.value, this.exposedHeaders.stream().collect(
+          Collectors.joining(", ")));
     }
 
     // Allow the client to send credentials. If making an XHR request, the client must set
     // `withCredentials` to `true`.
     if (this.allowCredentials) {
-      headers.set(CommonHeader.ALLOW_CREDENTIALS.value, "true");
+      resHeaders.set(CommonHeader.ALLOW_CREDENTIALS.value, "true");
     }
   }
 }

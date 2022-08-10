@@ -1,6 +1,7 @@
 package com.github.matthewzito.mug.cors;
 
 import com.github.matthewzito.mug.constant.Method;
+import com.github.matthewzito.mug.utils.NullSafe;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import java.util.ArrayList;
@@ -34,9 +35,12 @@ public class CorsUtils {
     }
 
     Headers reqHeaders = exchange.getRequestHeaders();
-
-    boolean hasOriginHeader = reqHeaders.getFirst(CommonHeader.ORIGIN.value) != null;
-    boolean hasReqMethod = reqHeaders.getFirst("Origin").intern() != null;
+    // @todo null safe
+    boolean hasOriginHeader =
+        NullSafe.getFirst(reqHeaders, CommonHeader.ORIGIN.value) != null;
+    // @todo null safe
+    boolean hasReqMethod =
+        NullSafe.getFirst(reqHeaders, CommonHeader.REQUEST_METHOD.value) != null;
 
     return hasOriginHeader && hasReqMethod;
   }
@@ -48,7 +52,9 @@ public class CorsUtils {
    * @return A list of requested headers.
    */
   public static ArrayList<String> deriveHeaders(HttpExchange exchange) {
-    String headersStr = exchange.getRequestHeaders().getFirst(CommonHeader.REQUEST_HEADERS.value);
+    // @todo evaluate whether `getRequestHeaders` needs to be null-checked
+    String headersStr =
+        NullSafe.getFirst(exchange.getRequestHeaders(), CommonHeader.REQUEST_HEADERS.value);
     ArrayList<String> headers = new ArrayList<>();
 
     if (headersStr == null || "".equals(headersStr)) {

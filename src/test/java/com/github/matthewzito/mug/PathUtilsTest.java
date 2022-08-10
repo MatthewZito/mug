@@ -14,7 +14,6 @@ import org.junit.jupiter.api.TestFactory;
  * Unit tests for PathUtils.
  */
 @DisplayName("Test path utilities")
-@SuppressWarnings("checkstyle:MethodParamPad")
 class PathUtilsTest {
   static record TestCase<T> (String name, String input, T expected) {
 
