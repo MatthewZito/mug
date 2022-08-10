@@ -57,6 +57,7 @@ public class Router implements HttpHandler {
     ArrayList<Middleware> mws = result.action().middlewares();
 
     // If there are any registered Middlewares, create a request chain.
+    // @todo relocate so invoked once
     for (int i = 0; i < mws.size(); i++) {
       Middleware next = mws.get(mws.size() - 1 - i);
       handler = next.handle(handler);

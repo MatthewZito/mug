@@ -7,7 +7,6 @@ import static com.github.matthewzito.mug.utils.TestUtils.TestCase;
 import static com.github.matthewzito.mug.utils.TestUtils.TestRoute;
 import static com.github.matthewzito.mug.utils.TestUtils.TestRouter;
 import static com.github.matthewzito.mug.utils.TestUtils.toList;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.spy;
@@ -34,37 +33,6 @@ class RouterTest {
   @BeforeEach
   void setUp() {
     testRouter = new TestRouter();
-  }
-
-  @DisplayName("Test route class registration via `use`")
-  @TestFactory
-  Stream<DynamicTest> shouldRegisterRoutesFromUse() {
-    testRouter.use(TestRoute.class);
-
-    PathTrie trie = testRouter.getTrie();
-
-    ArrayList<TestCase<?>> testCases = toList(
-        new TestCase<>(
-            "SearchRootHandler",
-            new SearchQuery(Method.GET, "/"), null),
-        new TestCase<>(
-            "SearchRootHandlerOtherMethod",
-            new SearchQuery(Method.POST, "/"), null),
-        new TestCase<>(
-            "SearchChildPathHandler",
-            new SearchQuery(Method.GET, "/api"), null),
-        new TestCase<>(
-            "SearchNestedPathHandler",
-            new SearchQuery(Method.GET, "/dev/api"), null));
-
-    return testCases.stream()
-        .map(
-            testCase -> DynamicTest.dynamicTest(
-                testCase.name(),
-                () -> {
-                  assertDoesNotThrow(
-                      () -> trie.search(testCase.input().method(), testCase.input().path()));
-                }));
   }
 
   @DisplayName("Test route class override")

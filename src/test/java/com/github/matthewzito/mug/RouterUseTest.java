@@ -1,16 +1,16 @@
 package com.github.matthewzito.mug;
 
-import static com.github.matthewzito.mug.utils.TestUtils.ExchangeMockFactory;
 import static com.github.matthewzito.mug.utils.TestUtils.SearchQuery;
 import static com.github.matthewzito.mug.utils.TestUtils.TestCase;
-import static com.github.matthewzito.mug.utils.TestUtils.TestRoute;
 import static com.github.matthewzito.mug.utils.TestUtils.TestRouter;
 import static com.github.matthewzito.mug.utils.TestUtils.toList;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.github.matthewzito.mug.router.annotations.Route;
 import com.github.matthewzito.mug.router.constant.Method;
@@ -18,6 +18,7 @@ import com.github.matthewzito.mug.router.trie.PathTrie;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,6 +31,12 @@ import org.junit.jupiter.api.TestFactory;
  */
 @DisplayName("Test http router/multiplexer `use` method")
 public class RouterUseTest {
+  /**
+   * Container for storing more metadata in TestCase.
+   */
+  public static record Expected(HttpHandler handler, int invocations) {
+
+  }
 
   /**
    * Spies for use in auto-registration via `use`.
@@ -48,6 +55,7 @@ public class RouterUseTest {
    */
   public static class TestRoutes {
     @Route(method = Method.GET, path = "/")
+    @Route(method = Method.GET, path = "/foo")
     public void handlerA(HttpExchange exchange) throws IOException {
       handlerSpy.handle(exchange);
     }
@@ -58,6 +66,7 @@ public class RouterUseTest {
     }
 
     @Route(method = Method.GET, path = "/api")
+    @Route(method = Method.GET, path = "/foo/bar")
     public void handlerC(HttpExchange exchange) throws IOException {
       handlerSpy3.handle(exchange);
     }
@@ -79,7 +88,7 @@ public class RouterUseTest {
   @TestFactory
   Stream<DynamicTest> shouldRegisterRoutesFromUse() {
     // Auto-register the routes.
-    testRouter.use(TestRoute.class);
+    testRouter.use(TestRoutes.class);
 
     PathTrie trie = testRouter.getTrie();
 
@@ -114,21 +123,31 @@ public class RouterUseTest {
 
     testRouter.use(TestRoutes.class);
 
-    ArrayList<TestCase<HttpHandler>> testCases = toList(
+    ArrayList<TestCase<Expected>> testCases = toList(
         new TestCase<>(
             "InvokeRootHandler",
-            new SearchQuery(Method.GET, "/"), RouterUseTest.handlerSpy),
+            new SearchQuery(Method.GET, "/"), new Expected(RouterUseTest.handlerSpy, 1)),
         new TestCase<>(
             "InvokeRootHandlerOtherMethod",
-            new SearchQuery(Method.POST, "/"), RouterUseTest.handlerSpy2),
+            new SearchQuery(Method.POST, "/"), new Expected(RouterUseTest.handlerSpy2, 1)),
         new TestCase<>(
             "InvokeChildPathHandler",
-            new SearchQuery(Method.GET, "/api"), RouterUseTest.handlerSpy3),
+            new SearchQuery(Method.GET, "/api"), new Expected(RouterUseTest.handlerSpy3, 1)),
         new TestCase<>(
             "InvokeNestedPathHandler",
-            new SearchQuery(Method.GET, "/dev/api"), RouterUseTest.handlerSpy4)
+            new SearchQuery(Method.GET, "/dev/api"), new Expected(RouterUseTest.handlerSpy4, 1)),
+        new TestCase<>(
+            "InvokeRepeatedAnnotationHandler",
+            new SearchQuery(Method.GET, "/foo"), new Expected(RouterUseTest.handlerSpy, 2)),
+        new TestCase<>(
+            "InvokeRepeatedAnnotationHandler",
+            new SearchQuery(Method.GET, "/foo/bar"), new Expected(RouterUseTest.handlerSpy3, 2))
 
     );
+
+    // We must use the same mock instance here, otherwise `verify` will resolve a different counter
+    // for invocations by reference.
+    HttpExchange exchangeMock = mock(HttpExchange.class);
 
     return testCases
         .stream()
@@ -137,29 +156,20 @@ public class RouterUseTest {
             () -> {
               // Grab the query details.
               SearchQuery query = testCase.input();
+              Expected expected = testCase.expected();
 
-              HttpExchange exchangeMock =
-                  ExchangeMockFactory.build("http://test.com" + query.path(),
-                      query.method());
 
               try {
-                System.out.printf("XXX HANDLER %s", testCase.expected());
-                // Register the route using the handler spy.
-                testRouter.register(
-                    toList(query.method()),
-                    query.path(),
-                    testCase.expected(),
-                    new ArrayList<>());
-
+                when(exchangeMock.getRequestURI())
+                    .thenReturn(new URI("http://test.com" + query.path()));
+                when(exchangeMock.getRequestMethod()).thenReturn(query.method().toString());
                 // Invoke the handler with the mock request.
                 testRouter.handle(exchangeMock);
                 // Assert the matched handler was resolved and invoked.
-                verify(testCase.expected(), times(1)).handle(exchangeMock);
-
+                verify(expected.handler, times(expected.invocations)).handle(exchangeMock);
               } catch (Exception e) {
                 fail("Did not expect an exception.", e);
               }
             }));
   }
-
 }

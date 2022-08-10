@@ -57,7 +57,7 @@ public class App {
         apiHandler,
         new ArrayList<Middleware>(Arrays.asList(mw, mw2)));
 
-    // router.use(TestRoute.class);
+    router.use(TestRoute.class);
 
     try {
       Server server = new Server(PORT, router);
