@@ -36,7 +36,7 @@ public class NullSafe {
    * @param <K> Map key type.
    * @param <V> Map value type.
    * @param mappable An mappable object.
-   * @param key
+   * @param key The Map key to retrieve.
    * @return The first value, or null if not extant.
    */
   public static <K, V> V getFirst(Map<K, List<V>> mappable, K key) {

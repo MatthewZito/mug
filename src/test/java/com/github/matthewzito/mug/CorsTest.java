@@ -11,12 +11,8 @@ import com.github.matthewzito.mug.constant.Status;
 import com.github.matthewzito.mug.cors.CommonHeader;
 import com.github.matthewzito.mug.cors.Cors;
 import com.github.matthewzito.mug.cors.CorsOptions;
-import com.github.matthewzito.mug.utils.NullSafe;
 import com.github.matthewzito.mug.utils.TestUtils;
 import com.github.matthewzito.mug.utils.TestUtils.ExchangeMockFactory;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.TestFactory;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -25,6 +21,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.TestFactory;
 
 /**
  * Unit tests for Cors.
@@ -200,9 +199,9 @@ class CorsTest {
                 CommonHeader.ALLOW_ORIGINS.value, "*",
                 CommonHeader.ALLOW_HEADERS.value, "X-Testing",
                 CommonHeader.ALLOW_METHODS.value, Method.GET.toString()),
-            Status.NO_CONTENT.value)
+            Status.NO_CONTENT.value),
 
-        , new CorsTestCase("HeadersAllowedMultiple",
+        new CorsTestCase("HeadersAllowedMultiple",
             new CorsOptions(TestUtils.toList("*"), TestUtils.toList(),
                 TestUtils.toList("X-Testing", "X-Testing-2", "X-Testing-3"), false, false, 0,
                 TestUtils.toList()),
@@ -232,9 +231,9 @@ class CorsTest {
                 CommonHeader.ALLOW_CREDENTIALS.value, "true",
                 CommonHeader.ALLOW_ORIGINS.value, "*",
                 CommonHeader.ALLOW_METHODS.value, Method.GET.toString()),
-            Status.NO_CONTENT.value)
+            Status.NO_CONTENT.value),
 
-        , new CorsTestCase("ExposeHeaders",
+        new CorsTestCase("ExposeHeaders",
             new CorsOptions(TestUtils.toList("http://foo.com"), TestUtils.toList(),
                 TestUtils.toList(), false, false, 0, TestUtils.toList("x-test")),
             Method.POST,

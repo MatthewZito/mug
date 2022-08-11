@@ -3,15 +3,13 @@ package com.github.matthewzito.mug;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+import com.github.matthewzito.mug.utils.NullSafe;
+import com.github.matthewzito.mug.utils.TestUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import com.github.matthewzito.mug.utils.NullSafe;
-import com.github.matthewzito.mug.utils.TestUtils;
 
 /**
  * Test shared mug utilities.

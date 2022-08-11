@@ -1,7 +1,7 @@
 package com.github.matthewzito.mug.cors;
 
-import java.util.ArrayList;
 import com.github.matthewzito.mug.constant.Method;
+import java.util.ArrayList;
 
 /**
  * Options for CORS middleware.

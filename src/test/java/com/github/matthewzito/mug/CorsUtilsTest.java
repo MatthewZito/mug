@@ -8,14 +8,14 @@ import com.github.matthewzito.mug.cors.CommonHeader;
 import com.github.matthewzito.mug.cors.CorsUtils;
 import com.github.matthewzito.mug.utils.TestUtils;
 import com.github.matthewzito.mug.utils.TestUtils.ExchangeMockFactory;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestFactory;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import java.util.ArrayList;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
 
 /**
  * Unit tests for CorsUtils.
