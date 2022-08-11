@@ -35,15 +35,18 @@
 
   <distributionManagement>
     <repository>
-      <id>ossrh</id>
-      <name>Central Repository OSSRH</name>
-      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+      <id>github</id>
+      <name>GitHub Packages</name>
+      <url>https://maven.pkg.github.com/MatthewZito/mug</url>
     </repository>
   </distributionManagement>
 
   <properties>
     <java.version>17</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.package>com.github.matthewzito.mug</project.package>
+    <project.package.path>com/github/matthewzito/mug</project.package.path>
+    <project.github.repository>matthewzito/mug</project.github.repository>
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
     <plugin.prettier.goal>write</plugin.prettier.goal>
