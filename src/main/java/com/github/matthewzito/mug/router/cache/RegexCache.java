@@ -1,7 +1,6 @@
 package com.github.matthewzito.mug.router.cache;
 
-
-import java.util.Hashtable;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 /**
@@ -11,10 +10,10 @@ public class RegexCache {
   /**
    * Thread-safe state mapping string patterns to their corresponding pre-compiled regex Patterns.
    */
-  public Hashtable<String, Pattern> state;
+  public ConcurrentHashMap<String, Pattern> state;
 
   public RegexCache() {
-    this.state = new Hashtable<>();
+    this.state = new ConcurrentHashMap<>();
   }
 
   /**
