@@ -1,8 +1,10 @@
 name: Continuous Deployment
 
-# on:
-#   push:
-#     branches:
-#       - master
+on:
+  # a push always happens when we merge, ergo this is the
+  # equivalent of `on.merge.branches.master`
+  push:
+    branches:
+      - master
 
 # jobs:
