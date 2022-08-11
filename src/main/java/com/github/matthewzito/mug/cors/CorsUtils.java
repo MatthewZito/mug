@@ -90,4 +90,6 @@ public class CorsUtils {
 
     return headers;
   }
+
+  private CorsUtils() {}
 }

@@ -17,4 +17,6 @@ public class Defaults {
   public static final ArrayList<String> defaultAllowedMethods =
       new ArrayList<>(Arrays.asList(Method.GET.toString(), Method.POST
           .toString(), Method.HEAD.toString()));
+
+  private Defaults() {}
 }

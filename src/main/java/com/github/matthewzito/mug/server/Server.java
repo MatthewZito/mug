@@ -45,6 +45,8 @@ public class Server {
    *
    * @param authMiddleware The authentication middleware. Must implement the
    *        AuthenticationMiddleware interface.
+   *
+   * @todo Implement, test, document.
    */
   public void withAuthentication(AuthenticationMiddleware authMiddleware) {
     List<Filter> filters = this.ctx.getFilters();

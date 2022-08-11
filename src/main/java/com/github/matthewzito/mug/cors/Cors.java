@@ -148,7 +148,7 @@ public class Cors {
    * @return A modified HttpHandler wrapped in CORS processing logic.
    */
   public HttpHandler use(HttpHandler handler) {
-    return (exchange) -> {
+    return exchange -> {
       if (CorsUtils.isPreflightRequest(exchange)) {
         this.handlePreflightRequest(exchange);
 

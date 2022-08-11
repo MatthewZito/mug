@@ -168,3 +168,42 @@ router.register(
 // after2
 // after
 ```
+
+### CORS Middleware
+
+```java
+Router router = new Router();
+
+// ...
+
+Cors cors = new Cors(new CorsOptions(
+
+  // A list of allowed origins for CORS requests.
+  new ArrayList<>(Arrays.asList("*")),
+
+  // A list of allowed HTTP methods for CORS requests.
+  new ArrayList<>(Arrays.asList(Method.GET, Method.DELETE, Method.POST)),
+
+  // A list of allowed non-simple headers for CORS requests.
+  new ArrayList<>(Arrays.asList("X-Something-From-Client")),
+
+  // A flag indicating whether the request may include Cookies.
+  false,
+
+  // Setting this flag to `true` will allow Preflight requests to
+  // propagate to the matched HttpHandler. This is useful in cases where the handler or
+  // sequence of middleware needs to inspect the request subsequent to the handling of the
+  // Preflight request.
+  false,
+
+  // The suggested duration, in seconds, that a response should remain in the browser's
+  // cache before another Preflight request is made.
+  36000,
+
+  // A list of non-simple headers that may be exposed to clients making CORS requests.
+  new ArrayList<>(Arrays.asList("X-Powered-By"))
+));
+
+// Wrap the router in CORS middleware to handle all CORS requests.
+Server server = new Server(PORT, cors.use(router));
+```
