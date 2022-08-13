@@ -108,6 +108,7 @@ public class TestUtils {
     return list;
   }
 
-  private TestUtils() {}
-
+  private TestUtils() {
+    throw new AssertionError("Non-instantiable");
+  }
 }

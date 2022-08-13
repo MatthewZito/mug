@@ -60,5 +60,7 @@ public class NullSafe {
     return iterator.hasNext() ? iterator.next() : defaultValue;
   }
 
-  private NullSafe() {}
+  private NullSafe() {
+    throw new AssertionError("Non-instantiable");
+  }
 }

@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 /**
  * Common utilities for use with CORS impl.
  */
-public class CorsUtils {
+class CorsUtils {
 
   /**
    * Determine whether the given request satisfies the criteria of a Preflight request.

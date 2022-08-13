@@ -1,11 +1,9 @@
-package com.github.matthewzito.mug;
+package com.github.matthewzito.mug.cors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 import com.github.matthewzito.mug.constant.Method;
-import com.github.matthewzito.mug.cors.CommonHeader;
-import com.github.matthewzito.mug.cors.CorsUtils;
 import com.github.matthewzito.mug.utils.TestUtils;
 import com.github.matthewzito.mug.utils.TestUtils.ExchangeMockFactory;
 import com.sun.net.httpserver.Headers;

@@ -114,6 +114,7 @@ public class Router implements HttpHandler {
 
       for (Route annotation : annotations) {
         try {
+          // @todo cache instance
           T instance = routesClass.getDeclaredConstructor().newInstance();
           java.lang.reflect.Method maybeHandler = instance
               .getClass()
