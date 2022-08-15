@@ -19,18 +19,18 @@ public class Demo {
     // Create a Middleware handler.
     Middleware mw = new Middleware() {
       @Override
-      public HttpHandler handle(HttpHandler handler) {
-        return (exchange) -> {
+      public RouteHandler handle(RouteHandler handler) {
+        return (exchange, context) -> {
           System.out.println("before");
           // Invoke the handler.
-          handler.handle(exchange);
+          handler.handle(exchange, context);
           System.out.println("after");
         };
       }
     };
 
     // Create a route handler.
-    HttpHandler routeHandler = (HttpExchange exchange) -> {
+    RouteHandler routeHandler = (exchange, context) -> {
       // ...
     };
 
@@ -69,25 +69,25 @@ public class Demo {
 ```java
 public class Demo {
   // Each method annotated with @Route will get registered when invoking `Router.use`,
-  // provided the method implements the HttpHandler interface.
+  // provided the method implements the RouteHandler interface.
   public static class RouteHandlers {
     @Route(method = Method.GET, path = "/")
-    public void handlerA(HttpExchange exchange) {
+    public void handlerA(HttpExchange exchange, RouteContext context) {
       // ...
     }
 
     @Route(method = Method.POST, path = "/")
-    public void handlerB(HttpExchange exchange) {
+    public void handlerB(HttpExchange exchange, RouteContext context) {
       // ...
     }
 
     @Route(method = Method.GET, path = "/api")
-    public void handlerC(HttpExchange exchange) {
+    public void handlerC(HttpExchange exchange, RouteContext context) {
       // ...
     }
 
     @Route(method = Method.GET, path = "/dev/api")
-    public void handlerD(HttpExchange exchange) {
+    public void handlerD(HttpExchange exchange, RouteContext context) {
       // ...
     }
   }
@@ -117,10 +117,23 @@ public class Demo {
 }
 ```
 
+### Default / Fallback Route handlers
+
+The Router instance ships with default route handlers that are invoked when a route match is either not found, or found but invoked with an unregistered method (404 Not found and 405 Method Not Allowed, respectively). To override these, use the Router setters:
+
+```java
+
+  RouteHandler notFoundHandler = /* ... */
+  router.handleNotFoundWith(notFoundHandler);
+
+  RouteHandler methodNotAllowedHandler = /* ... */
+  router.handleMethodNotAllowedWith(methodNotAllowedHandler);
+```
+
 ### Middleware
 
 ```java
-HttpHandler apiHandler = exchange -> {
+RouteHandler apiHandler = (exchange, context) -> {
   System.out.println("Inside handler");
 
   exchange.sendResponseHeaders(Status.OK.value, -1);
@@ -129,10 +142,10 @@ HttpHandler apiHandler = exchange -> {
 
 Middleware mw = new Middleware() {
   @Override
-  public HttpHandler handle(HttpHandler handler) {
-    return (exchange) -> {
+  public RouteHandler handle(RouteHandler handler) {
+    return (exchange, context) -> {
       System.out.println("before");
-      handler.handle(exchange);
+      handler.handle(exchange, context);
       System.out.println("after");
     };
   }
@@ -140,10 +153,10 @@ Middleware mw = new Middleware() {
 
 Middleware mw2 = new Middleware() {
   @Override
-  public HttpHandler handle(HttpHandler handler) {
-    return (exchange) -> {
+  public RouteHandler handle(RouteHandler handler) {
+    return (exchange, context) -> {
       System.out.println("before2");
-      handler.handle(exchange);
+      handler.handle(exchange, context);
       System.out.println("after2");
     };
   }
@@ -176,33 +189,25 @@ Router router = new Router();
 
 // ...
 
-Cors cors = new Cors(new CorsOptions(
-
+Cors cors = new Cors.Builder()
   // A list of allowed origins for CORS requests.
-  new ArrayList<>(Arrays.asList("*")),
-
+  .allowedOrigins("*")
   // A list of allowed HTTP methods for CORS requests.
-  new ArrayList<>(Arrays.asList(Method.GET, Method.DELETE, Method.POST)),
-
+  .allowedMethods(Method.GET, Method.DELETE, Method.POST)
   // A list of allowed non-simple headers for CORS requests.
-  new ArrayList<>(Arrays.asList("X-Something-From-Client")),
-
+  .allowedHeaders("X-Something-From-Client")
   // A flag indicating whether the request may include Cookies.
-  false,
-
+  .allowCredentials(false)
   // Setting this flag to `true` will allow Preflight requests to
-  // propagate to the matched HttpHandler. This is useful in cases where the handler or
+  // propagate to the matched RouteHandler. This is useful in cases where the handler or
   // sequence of middleware needs to inspect the request subsequent to the handling of the
   // Preflight request.
-  false,
-
+  .useOptionsPassthrough(false)
   // The suggested duration, in seconds, that a response should remain in the browser's
   // cache before another Preflight request is made.
-  36000,
-
+  .maxAge(36000)
   // A list of non-simple headers that may be exposed to clients making CORS requests.
-  new ArrayList<>(Arrays.asList("X-Powered-By"))
-));
+  .exposeHeaders("X-Powered-By");
 
 // Wrap the router in CORS middleware to handle all CORS requests.
 Server server = new Server(PORT, cors.use(router));
