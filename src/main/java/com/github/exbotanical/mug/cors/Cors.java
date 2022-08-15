@@ -5,7 +5,9 @@ import com.github.exbotanical.mug.constant.Status;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.stream.Collectors;
 
 /**
@@ -64,19 +66,135 @@ public class Cors {
   public int maxAge;
 
   /**
+   * A builder for Cors middleware.
+   */
+  public static class Builder {
+    ArrayList<String> allowedOrigins = new ArrayList<>();
+    ArrayList<Method> allowedMethods = new ArrayList<>();
+    ArrayList<String> allowedHeaders = new ArrayList<>();
+    ArrayList<String> exposeHeaders = new ArrayList<>();
+    boolean allowCredentials = false;
+    boolean useOptionsPassthrough = false;
+    int maxAge = 0;
+
+    Builder() {}
+
+    /**
+     * Add a list of allowed origins for CORS requests.
+     */
+    public Builder allowedOrigins(String... allowedOrigins) {
+      this.allowedOrigins = new ArrayList<>(Arrays.asList(allowedOrigins));
+
+      return this;
+    }
+
+    /**
+     * Set a list of allowed HTTP methods for CORS requests.
+     */
+    public Builder allowedMethods(Method... allowedMethods) {
+      this.allowedMethods = new ArrayList<>(Arrays.asList(allowedMethods));
+
+      return this;
+    }
+
+    /**
+     * Set a list of allowed non-simple headers for CORS requests.
+     */
+    public Builder allowedHeaders(String... allowedHeaders) {
+      this.allowedHeaders = new ArrayList<>(Arrays.asList(allowedHeaders));
+
+      return this;
+    }
+
+    /**
+     * Set a flag indicating whether the request may include Cookies.
+     */
+    public Builder allowCredentials(boolean allowCredentials) {
+      this.allowCredentials = allowCredentials;
+      return this;
+    }
+
+    /**
+     * Setting this flag to `true` will allow Preflight requests to propagate to the matched
+     * HttpHandler. This is useful in cases where the handler or sequence of middleware needs to
+     * inspect the request subsequent to the handling of the Preflight request.
+     */
+    public Builder useOptionsPassthrough(boolean useOptionsPassthrough) {
+      this.useOptionsPassthrough = useOptionsPassthrough;
+      return this;
+    }
+
+    /**
+     * Set the suggested duration, in seconds, that a response should remain in the browser's cache
+     * before another Preflight request is made.
+     */
+    public Builder maxAge(int maxAge) {
+      this.maxAge = maxAge;
+      return this;
+    }
+
+    /**
+     * Set a list of non-simple headers that may be exposed to clients making CORS requests.
+     */
+    public Builder exposeHeaders(String... exposeHeaders) {
+      this.exposeHeaders = new ArrayList<>(Arrays.asList(exposeHeaders));
+
+      return this;
+    }
+
+    /**
+     * Build the Cors instance with the provided options.
+     *
+     * @return Cors instance.
+     */
+    public Cors build() {
+      return new Cors(this);
+    }
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder result = new StringBuilder();
+    String newLine = System.getProperty("line.separator");
+
+    result.append("Cors {");
+    result.append(newLine);
+
+    // determine fields declared in this class only (no fields of superclass)
+    Field[] fields = this.getClass().getDeclaredFields();
+
+    // print field names paired with their values
+    for (Field field : fields) {
+      result.append("  ");
+      try {
+        result.append(field.getName());
+        result.append(": ");
+        // requires access to private field:
+        result.append(field.get(this));
+      } catch (IllegalAccessException ex) {
+        System.out.println(ex);
+      }
+      result.append(newLine);
+    }
+    result.append("}");
+
+    return result.toString();
+  }
+
+  /**
    * Initialize CORS middleware with the provided configurations.
    *
-   * @param options CorsOptions configuration.
+   * @param options Builder configuration.
    */
-  public Cors(CorsOptions options) {
-    ArrayList<String> allowedOrigins = options.allowedOrigins();
-    ArrayList<Method> allowedMethods = options.allowedMethods();
-    ArrayList<String> allowedHeaders = options.allowedHeaders();
+  private Cors(Builder builder) {
+    ArrayList<String> allowedOrigins = builder.allowedOrigins;
+    ArrayList<Method> allowedMethods = builder.allowedMethods;
+    ArrayList<String> allowedHeaders = builder.allowedHeaders;
 
-    this.allowCredentials = options.allowCredentials();
-    this.useOptionsPassthrough = options.useOptionsPassthrough();
-    this.maxAge = options.maxAge();
-    this.exposedHeaders = options.exposeHeaders();
+    this.allowCredentials = builder.allowCredentials;
+    this.useOptionsPassthrough = builder.useOptionsPassthrough;
+    this.maxAge = builder.maxAge;
+    this.exposedHeaders = builder.exposeHeaders;
 
     // Register origins: if no given origins, default to allow all e.g. "*".
     if (allowedOrigins.size() == 0) {
@@ -160,7 +278,7 @@ public class Cors {
    * @param origin The request origin.
    * @return A boolean indicating whether the origin is allowed per the CORS impl.
    */
-  protected boolean isOriginAllowed(String origin) {
+  public boolean isOriginAllowed(String origin) {
     if (this.allowAllOrigins) {
       return true;
     }
@@ -182,7 +300,7 @@ public class Cors {
    * @param method The request method.
    * @return A boolean indicating whether the method is allowed per the CORS impl.
    */
-  protected boolean isMethodAllowed(String method) {
+  public boolean isMethodAllowed(String method) {
     if (this.allowedMethods.size() == 0) {
       return false;
     }
@@ -208,7 +326,7 @@ public class Cors {
    *        Access-Control-Request-Headers header.
    * @return A boolean indicating whether the headers are allowed per the CORS impl.
    */
-  protected boolean areHeadersAllowed(ArrayList<String> headers) {
+  public boolean areHeadersAllowed(ArrayList<String> headers) {
     if (this.allowAllHeaders || headers.size() == 0) {
       return true;
     }

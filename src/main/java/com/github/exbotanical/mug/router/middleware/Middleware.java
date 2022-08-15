@@ -1,7 +1,6 @@
 package com.github.exbotanical.mug.router.middleware;
 
 import com.github.exbotanical.mug.router.RouteHandler;
-import com.sun.net.httpserver.HttpHandler;
 
 /**
  * Represents a single method in a continuation sequence of HttpHandlers. A Middleware method is

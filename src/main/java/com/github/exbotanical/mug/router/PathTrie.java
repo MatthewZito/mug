@@ -5,7 +5,6 @@ import com.github.exbotanical.mug.constant.Path;
 import com.github.exbotanical.mug.router.errors.MethodNotAllowedException;
 import com.github.exbotanical.mug.router.errors.NotFoundException;
 import com.github.exbotanical.mug.router.middleware.Middleware;
-import com.sun.net.httpserver.HttpHandler;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.regex.Pattern;

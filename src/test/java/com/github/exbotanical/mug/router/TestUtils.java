@@ -47,20 +47,18 @@ public final class TestUtils {
    */
   public static class TestRoute {
     @Route(method = Method.GET, path = "/")
-    public void handlerA(HttpExchange exchange) {}
+    public void handlerA(HttpExchange exchange, RouteContext context) {}
 
     @Route(method = Method.POST, path = "/")
-    public void handlerB(HttpExchange exchange) {}
+    public void handlerB(HttpExchange exchange, RouteContext context) {}
 
     @Route(method = Method.GET, path = "/api")
-    public void handlerC(HttpExchange exchange) {}
+    public void handlerC(HttpExchange exchange, RouteContext context) {}
 
     @Route(method = Method.GET, path = "/dev/api")
-    public void handlerD(HttpExchange exchange) {}
+    public void handlerD(HttpExchange exchange, RouteContext context) {}
 
-    public TestRoute() {
-      System.out.println("INITIALIZED");
-    }
+    public TestRoute() {}
   }
 
   /**

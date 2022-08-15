@@ -10,8 +10,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.github.exbotanical.mug.constant.Method;
 import com.github.exbotanical.mug.constant.Path;
 import com.github.exbotanical.mug.router.middleware.Middleware;
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
 import java.util.ArrayList;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;

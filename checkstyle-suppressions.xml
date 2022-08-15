@@ -8,7 +8,7 @@
   <suppress files="[\\/]example[\\/]" checks="[a-zA-Z0-9]*"/>
   <suppress checks="VariableDeclarationUsageDistance"
              files="Cors.java"
-             lines="72,73,74"/>
+             lines="190,191,192"/>
   <suppress checks="MethodParamPad"
              files="TestUtils.java"
              lines="32"/>
@@ -18,4 +18,7 @@
   <suppress checks="MethodParamPad"
              files="PathUtilsTest.java"
              lines="16"/>
+  <suppress checks="LineLength"
+             files="ToStringTest.java"
+             lines="29"/>
 </suppressions>

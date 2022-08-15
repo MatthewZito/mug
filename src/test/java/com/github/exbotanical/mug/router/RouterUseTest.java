@@ -13,10 +13,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.github.exbotanical.mug.constant.Method;
-import com.github.exbotanical.mug.router.PathTrie;
 import com.github.exbotanical.mug.router.annotations.Route;
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
@@ -34,7 +32,7 @@ public class RouterUseTest {
   /**
    * Container for storing more metadata in TestCase.
    */
-  public static record Expected(HttpHandler handler, int invocations) {
+  public static record Expected(RouteHandler handler, int invocations) {
 
   }
 
@@ -42,13 +40,13 @@ public class RouterUseTest {
    * Spies for use in auto-registration via `use`.
    */
 
-  public static HttpHandler handlerSpy = spy(HttpHandler.class);
+  public static RouteHandler handlerSpy = spy(RouteHandler.class);
 
-  public static HttpHandler handlerSpy2 = spy(HttpHandler.class);
+  public static RouteHandler handlerSpy2 = spy(RouteHandler.class);
 
-  public static HttpHandler handlerSpy3 = spy(HttpHandler.class);
+  public static RouteHandler handlerSpy3 = spy(RouteHandler.class);
 
-  public static HttpHandler handlerSpy4 = spy(HttpHandler.class);
+  public static RouteHandler handlerSpy4 = spy(RouteHandler.class);
 
   /**
    * Implements a routes configuration for use with `Router.use`.
@@ -56,24 +54,24 @@ public class RouterUseTest {
   public static class TestRoutes {
     @Route(method = Method.GET, path = "/")
     @Route(method = Method.GET, path = "/foo")
-    public void handlerA(HttpExchange exchange) throws IOException {
-      handlerSpy.handle(exchange);
+    public void handlerA(HttpExchange exchange, RouteContext context) throws IOException {
+      handlerSpy.handle(exchange, context);
     }
 
     @Route(method = Method.POST, path = "/")
-    public void handlerB(HttpExchange exchange) throws IOException {
-      handlerSpy2.handle(exchange);
+    public void handlerB(HttpExchange exchange, RouteContext context) throws IOException {
+      handlerSpy2.handle(exchange, context);
     }
 
     @Route(method = Method.GET, path = "/api")
     @Route(method = Method.GET, path = "/foo/bar")
-    public void handlerC(HttpExchange exchange) throws IOException {
-      handlerSpy3.handle(exchange);
+    public void handlerC(HttpExchange exchange, RouteContext context) throws IOException {
+      handlerSpy3.handle(exchange, context);
     }
 
     @Route(method = Method.GET, path = "/dev/api")
-    public void handlerD(HttpExchange exchange) throws IOException {
-      handlerSpy4.handle(exchange);
+    public void handlerD(HttpExchange exchange, RouteContext context) throws IOException {
+      handlerSpy4.handle(exchange, context);
     }
   }
 
@@ -166,7 +164,8 @@ public class RouterUseTest {
                 // Invoke the handler with the mock request.
                 testRouter.handle(exchangeMock);
                 // Assert the matched handler was resolved and invoked.
-                verify(expected.handler, times(expected.invocations)).handle(exchangeMock);
+                verify(expected.handler, times(expected.invocations)).handle(exchangeMock,
+                    new RouteContext(new ArrayList<>()));
               } catch (Exception e) {
                 fail("Did not expect an exception.", e);
               }

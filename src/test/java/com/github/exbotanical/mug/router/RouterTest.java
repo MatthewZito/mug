@@ -15,7 +15,6 @@ import static org.mockito.Mockito.verify;
 
 import com.github.exbotanical.mug.constant.Method;
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
 import java.util.ArrayList;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
@@ -137,12 +136,10 @@ class RouterTest {
               SearchQuery query = testCase.input();
 
               // Initialize a route handler spy. We'll test whether this was actually
-              // invoked
-              // when the router receives a mock request.
+              // invoked when the router receives a mock request.
               RouteHandler handlerSpy = spy(RouteHandler.class);
               // Generate the mock HttpExchange. This represents an HTTP request that
-              // will
-              // match the expected path and method.
+              // will match the expected path and method.
               HttpExchange exchangeMock =
                   ExchangeMockFactory.build("http://test.com" + query.path(),
                       query.method());
@@ -158,7 +155,8 @@ class RouterTest {
                 // Invoke the handler with the mock request.
                 testRouter.handle(exchangeMock);
                 // Assert the matched handler was resolved and invoked.
-                verify(handlerSpy, times(1)).handle(exchangeMock, null);
+                verify(handlerSpy, times(1)).handle(exchangeMock,
+                    new RouteContext(new ArrayList<>()));
 
               } catch (Exception e) {
                 fail("Did not expect an exception.", e);

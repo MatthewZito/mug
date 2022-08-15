@@ -27,28 +27,9 @@ import org.junit.jupiter.api.TestFactory;
  */
 @DisplayName("Test Cors")
 class CorsTest {
-  static class TestCors extends Cors {
-    TestCors(CorsOptions options) {
-      super(options);
-
-    }
-
-    boolean testAreHeadersAllowed(ArrayList<String> headers) {
-      return this.areHeadersAllowed(headers);
-    }
-
-    boolean testIsMethodAllowed(String method) {
-      return this.isMethodAllowed(method);
-    }
-
-    boolean testIsOriginAllowed(String origin) {
-      return this.isOriginAllowed(origin);
-    }
-  }
-
   static record CorsTestCase(
       String name,
-      CorsOptions options,
+      Cors cors,
       Method method,
       Map<String, String> reqHeaders,
       Map<String, String> resHeaders,
@@ -57,21 +38,21 @@ class CorsTest {
 
   static record HeaderTestCase(
       String name,
-      CorsOptions options,
+      Cors cors,
       ArrayList<String> testHeaders,
       boolean isAllowed) {
   }
 
   static record MethodTestCase(
       String name,
-      CorsOptions options,
+      Cors cors,
       Method testMethod,
       boolean isAllowed) {
   }
 
   static record OriginTestCase(
       String name,
-      CorsOptions options,
+      Cors cors,
       Map<String, Boolean> tests) {
   }
 
@@ -84,14 +65,9 @@ class CorsTest {
     ArrayList<CorsTestCase> testCases = TestUtils.toList(
         new CorsTestCase(
             "AllOriginAllowed",
-            new CorsOptions(
-                TestUtils.toList("*"),
-                TestUtils.toList(),
-                TestUtils.toList(),
-                false,
-                false,
-                0,
-                TestUtils.toList()),
+            new Cors.Builder()
+                .allowedOrigins("*")
+                .build(),
             Method.GET,
             Map.of(CommonHeader.ORIGIN.value, "http://foo.com"),
             Map.of(
@@ -101,14 +77,9 @@ class CorsTest {
 
 
         new CorsTestCase("OriginAllowed",
-            new CorsOptions(
-                TestUtils.toList("http://foo.com"),
-                TestUtils.toList(),
-                TestUtils.toList(),
-                false,
-                false,
-                0,
-                TestUtils.toList()),
+            new Cors.Builder()
+                .allowedOrigins("http://foo.com")
+                .build(),
             Method.GET,
             Map.of(
                 CommonHeader.ORIGIN.value, "http://foo.com"),
@@ -118,10 +89,10 @@ class CorsTest {
             0),
 
         new CorsTestCase("OriginAllowedMultipleProvided",
-            new CorsOptions(
-                TestUtils.toList("http://foo.com", "http://bar.com"),
-                TestUtils.toList(),
-                TestUtils.toList(), false, false, 0, TestUtils.toList()),
+            new Cors.Builder()
+                .allowedOrigins("http://foo.com", "http://bar.com")
+                .build(),
+
             Method.GET,
             Map.of(
                 CommonHeader.ORIGIN.value, "http://bar.com"),
@@ -131,8 +102,9 @@ class CorsTest {
             0),
 
         new CorsTestCase("GETMethodAllowedDefault",
-            new CorsOptions(TestUtils.toList("http://foo.com"), TestUtils.toList(),
-                TestUtils.toList(), false, false, 0, TestUtils.toList()),
+            new Cors.Builder()
+                .allowedOrigins("http://foo.com")
+                .build(),
             Method.GET,
             Map.of(
                 CommonHeader.ORIGIN.value, "http://foo.com"),
@@ -142,8 +114,9 @@ class CorsTest {
             0),
 
         new CorsTestCase("POSTMethodAllowedDefault",
-            new CorsOptions(TestUtils.toList("http://foo.com"), TestUtils.toList(),
-                TestUtils.toList(), false, false, 0, TestUtils.toList()),
+            new Cors.Builder()
+                .allowedOrigins("http://foo.com")
+                .build(),
             Method.POST,
             Map.of(
                 CommonHeader.ORIGIN.value, "http://foo.com"),
@@ -153,8 +126,9 @@ class CorsTest {
             0),
 
         new CorsTestCase("HEADMethodAllowedDefault",
-            new CorsOptions(TestUtils.toList("http://foo.com"), TestUtils.toList(),
-                TestUtils.toList(), false, false, 0, TestUtils.toList()),
+            new Cors.Builder()
+                .allowedOrigins("http://foo.com")
+                .build(),
             Method.HEAD,
             Map.of(
                 CommonHeader.ORIGIN.value, "http://foo.com"),
@@ -164,14 +138,10 @@ class CorsTest {
             0),
 
         new CorsTestCase("MethodAllowed",
-            new CorsOptions(
-                TestUtils.toList("*"),
-                TestUtils.toList(Method.DELETE),
-                TestUtils.toList(),
-                false,
-                false,
-                0,
-                TestUtils.toList()),
+            new Cors.Builder()
+                .allowedOrigins("*")
+                .allowedMethods(Method.DELETE)
+                .build(),
             Method.OPTIONS,
             Map.of(
                 CommonHeader.ORIGIN.value, "http://foo.com",
@@ -184,8 +154,10 @@ class CorsTest {
             Status.NO_CONTENT.value),
 
         new CorsTestCase("HeadersAllowed",
-            new CorsOptions(TestUtils.toList("*"), TestUtils.toList(),
-                TestUtils.toList("X-Testing"), false, false, 0, TestUtils.toList()),
+            new Cors.Builder()
+                .allowedOrigins("*")
+                .allowedHeaders("X-Testing")
+                .build(),
             Method.OPTIONS,
             Map.of(
                 CommonHeader.ORIGIN.value, "http://foo.com",
@@ -200,10 +172,10 @@ class CorsTest {
             Status.NO_CONTENT.value),
 
         new CorsTestCase("HeadersAllowedMultiple",
-            new CorsOptions(TestUtils.toList("*"), TestUtils.toList(),
-                TestUtils.toList("X-Testing", "X-Testing-2", "X-Testing-3"), false,
-                false, 0,
-                TestUtils.toList()),
+            new Cors.Builder()
+                .allowedOrigins("*")
+                .allowedHeaders("X-Testing", "X-Testing-2", "X-Testing-3")
+                .build(),
             Method.OPTIONS,
             Map.of(
                 CommonHeader.ORIGIN.value, "http://foo.com",
@@ -220,9 +192,10 @@ class CorsTest {
             Status.NO_CONTENT.value),
 
         new CorsTestCase("CredentialsAllowed",
-            new CorsOptions(TestUtils.toList("*"), TestUtils.toList(),
-                TestUtils.toList(), true,
-                false, 0, TestUtils.toList()),
+            new Cors.Builder()
+                .allowedOrigins("*")
+                .allowCredentials(true)
+                .build(),
             Method.OPTIONS,
             Map.of(
                 CommonHeader.ORIGIN.value, "http://foo.com",
@@ -236,8 +209,11 @@ class CorsTest {
             Status.NO_CONTENT.value),
 
         new CorsTestCase("ExposeHeaders",
-            new CorsOptions(TestUtils.toList("http://foo.com"), TestUtils.toList(),
-                TestUtils.toList(), false, false, 0, TestUtils.toList("x-test")),
+            new Cors.Builder()
+                .allowedOrigins("http://foo.com")
+                .exposeHeaders(
+                    "x-test")
+                .build(),
             Method.POST,
             Map.of(
                 CommonHeader.ORIGIN.value, "http://foo.com"),
@@ -248,9 +224,10 @@ class CorsTest {
             0),
 
         new CorsTestCase("ExposeHeadersMultiple",
-            new CorsOptions(TestUtils.toList("http://foo.com"), TestUtils.toList(),
-                TestUtils.toList(), false, false, 0,
-                TestUtils.toList("x-test-1", "x-test-2")),
+            new Cors.Builder()
+                .allowedOrigins("http://foo.com")
+                .exposeHeaders("x-test-1", "x-test-2")
+                .build(),
             Method.POST,
             Map.of(
                 CommonHeader.ORIGIN.value, "http://foo.com"),
@@ -262,8 +239,9 @@ class CorsTest {
 
         // CORS Rejections
         new CorsTestCase("OriginNotAllowed",
-            new CorsOptions(TestUtils.toList("http://foo.com"), TestUtils.toList(),
-                TestUtils.toList(), false, false, 0, TestUtils.toList()),
+            new Cors.Builder()
+                .allowedOrigins("http://foo.com")
+                .build(),
             Method.GET,
             Map.of(
                 CommonHeader.ORIGIN.value, "http://bar.com"),
@@ -272,8 +250,9 @@ class CorsTest {
             0),
 
         new CorsTestCase("OriginNotAllowedPortMismatch",
-            new CorsOptions(TestUtils.toList("http://foo.com:443"), TestUtils.toList(),
-                TestUtils.toList(), false, false, 0, TestUtils.toList()),
+            new Cors.Builder()
+                .allowedOrigins("http://foo.com:443")
+                .build(),
             Method.GET,
             Map.of(
                 CommonHeader.ORIGIN.value, "http://foo.com:444"),
@@ -282,9 +261,9 @@ class CorsTest {
             0),
 
         new CorsTestCase("MethodNotAllowed",
-            new CorsOptions(TestUtils.toList("*"), TestUtils.toList(),
-                TestUtils.toList(), false,
-                false, 0, TestUtils.toList()),
+            new Cors.Builder()
+                .allowedOrigins("*")
+                .build(),
             Method.OPTIONS,
             Map.of(
                 CommonHeader.ORIGIN.value, "http://foo.com",
@@ -295,9 +274,9 @@ class CorsTest {
             Status.NO_CONTENT.value),
 
         new CorsTestCase("HeadersNotAllowed",
-            new CorsOptions(TestUtils.toList("*"), TestUtils.toList(),
-                TestUtils.toList(), false,
-                false, 0, TestUtils.toList()),
+            new Cors.Builder()
+                .allowedOrigins("*")
+                .build(),
             Method.OPTIONS,
             Map.of(
                 CommonHeader.ORIGIN.value, "http://foo.com",
@@ -330,7 +309,7 @@ class CorsTest {
               when(exchangeMock.getRequestHeaders()).thenReturn(reqHeaders);
               when(exchangeMock.getResponseHeaders()).thenReturn(resHeaders);
 
-              Cors cors = new Cors(testCase.options);
+              Cors cors = testCase.cors;
 
               cors.use(testHandler).handle(exchangeMock);
 
@@ -360,27 +339,20 @@ class CorsTest {
     ArrayList<HeaderTestCase> testCases = TestUtils.toList(
         new HeaderTestCase(
             "ExplicitHeaders",
-            new CorsOptions(
-                TestUtils.toList("*"),
-                TestUtils.toList(),
-                TestUtils.toList("x-test-1", "x-test-2"),
-                false,
-                false,
-                0,
-                TestUtils.toList()),
+            new Cors.Builder()
+                .allowedOrigins("*")
+                .allowedHeaders("x-test-1",
+                    "x-test-2")
+                .build(),
             TestUtils.toList("x-test-1", "x-test-2"),
             true),
 
         new HeaderTestCase(
             "ExtraneousHeaderNotAllowed",
-            new CorsOptions(
-                TestUtils.toList("*"),
-                TestUtils.toList(),
-                TestUtils.toList("x-test-1", "x-test-2"),
-                false,
-                false,
-                0,
-                TestUtils.toList()),
+            new Cors.Builder()
+                .allowedOrigins("*")
+                .allowedHeaders("x-test-1", "x-test-2")
+                .build(),
             TestUtils.toList("x-test",
                 "x-test-1",
                 "x-test-2"),
@@ -388,53 +360,37 @@ class CorsTest {
 
         new HeaderTestCase(
             "EmptyHeaderNotAllowed",
-            new CorsOptions(
-                TestUtils.toList("*"),
-                TestUtils.toList(),
-                TestUtils.toList("x-test-1", "x-test-2"),
-                false,
-                false,
-                0,
-                TestUtils.toList()),
+            new Cors.Builder()
+                .allowedOrigins("*")
+                .allowedHeaders("x-test-1", "x-test-2")
+                .build(),
             TestUtils.toList(""),
             false),
 
         new HeaderTestCase(
             "WildcardHeaders",
-            new CorsOptions(
-                TestUtils.toList("*"),
-                TestUtils.toList(),
-                TestUtils.toList("*"),
-                false,
-                false,
-                0,
-                TestUtils.toList()),
+            new Cors.Builder()
+                .allowedOrigins("*")
+                .allowedHeaders("*")
+                .build(),
             TestUtils.toList("x-test-1", "x-test-2"),
             true),
 
         new HeaderTestCase(
             "WildcardHeadersAlt",
-            new CorsOptions(
-                TestUtils.toList("*"),
-                TestUtils.toList(),
-                TestUtils.toList("*"),
-                false,
-                false,
-                0,
-                TestUtils.toList()),
+            new Cors.Builder()
+                .allowedOrigins("*")
+                .allowedHeaders("*")
+                .build(),
             TestUtils.toList("x-test", "x-test-1", "x-test-2"),
             true),
 
         new HeaderTestCase(
             "WildcardHeadersAltEmpty",
-            new CorsOptions(
-                TestUtils.toList("*"),
-                TestUtils.toList(),
-                TestUtils.toList("*"),
-                false,
-                false,
-                0,
-                TestUtils.toList()),
+            new Cors.Builder()
+                .allowedOrigins("*")
+                .allowedHeaders("*")
+                .build(),
             TestUtils.toList(""),
             true)
 
@@ -444,10 +400,7 @@ class CorsTest {
         .map(testCase -> DynamicTest.dynamicTest(
             testCase.name,
             () -> {
-
-              TestCors cors = new TestCors(testCase.options);
-
-              boolean actual = cors.testAreHeadersAllowed(testCase.testHeaders);
+              boolean actual = testCase.cors.areHeadersAllowed(testCase.testHeaders);
               assertEquals(testCase.isAllowed, actual);
             }));
   }
@@ -458,118 +411,76 @@ class CorsTest {
     ArrayList<MethodTestCase> testCases = TestUtils.toList(
         new MethodTestCase(
             "ExplicitMethodOk",
-            new CorsOptions(
-                TestUtils.toList("*"),
-                TestUtils.toList(Method.DELETE, Method.PUT),
-                TestUtils.toList(),
-                false,
-                false,
-                0,
-                TestUtils.toList()),
+            new Cors.Builder()
+                .allowedOrigins("*")
+                .allowedMethods(Method.DELETE, Method.PUT)
+                .build(),
             Method.DELETE,
             true),
 
         new MethodTestCase(
             "ExplicitMethodOkAlt",
-            new CorsOptions(
-                TestUtils.toList("*"),
-                TestUtils.toList(Method.DELETE, Method.PUT),
-                TestUtils.toList(),
-                false,
-                false,
-                0,
-                TestUtils.toList()),
+            new Cors.Builder()
+                .allowedOrigins("*")
+                .allowedMethods(Method.DELETE, Method.PUT)
+                .build(),
             Method.PUT,
             true),
 
         new MethodTestCase(
             "ExplicitMethodNotAllowed",
-            new CorsOptions(
-                TestUtils.toList("*"),
-                TestUtils.toList(Method.DELETE, Method.PUT),
-                TestUtils.toList(),
-                false,
-                false,
-                0,
-                TestUtils.toList()),
+            new Cors.Builder()
+                .allowedOrigins("*")
+                .allowedMethods(Method.DELETE, Method.PUT)
+                .build(),
             Method.PATCH,
             false),
 
         new MethodTestCase(
             "DefaultMethodsOkGET",
-            new CorsOptions(
-                TestUtils.toList("*"),
-                TestUtils.toList(),
-                TestUtils.toList(),
-                false,
-                false,
-                0,
-                TestUtils.toList()),
+            new Cors.Builder()
+                .allowedOrigins("*")
+                .build(),
             Method.GET,
             true),
 
         new MethodTestCase(
             "DefaultMethodsOkPOST",
-            new CorsOptions(
-                TestUtils.toList("*"),
-                TestUtils.toList(),
-                TestUtils.toList(),
-                false,
-                false,
-                0,
-                TestUtils.toList()),
+            new Cors.Builder()
+                .allowedOrigins("*")
+                .build(),
             Method.POST,
             true),
 
         new MethodTestCase(
             "DefaultMethodsOkHEAD",
-            new CorsOptions(
-                TestUtils.toList("*"),
-                TestUtils.toList(),
-                TestUtils.toList(),
-                false,
-                false,
-                0,
-                TestUtils.toList()),
+            new Cors.Builder()
+                .allowedOrigins("*")
+                .build(),
             Method.HEAD,
             true),
 
         new MethodTestCase(
             "DefaultMethodsNotAllowedDELETE",
-            new CorsOptions(
-                TestUtils.toList("*"),
-                TestUtils.toList(),
-                TestUtils.toList(),
-                false,
-                false,
-                0,
-                TestUtils.toList()),
+            new Cors.Builder()
+                .allowedOrigins("*")
+                .build(),
             Method.DELETE,
             false),
 
         new MethodTestCase(
             "DefaultMethodsNotAllowedPATCH",
-            new CorsOptions(
-                TestUtils.toList("*"),
-                TestUtils.toList(),
-                TestUtils.toList(),
-                false,
-                false,
-                0,
-                TestUtils.toList()),
+            new Cors.Builder()
+                .allowedOrigins("*")
+                .build(),
             Method.PATCH,
             false),
 
         new MethodTestCase(
             "DefaultMethodsNotAllowedPUT",
-            new CorsOptions(
-                TestUtils.toList("*"),
-                TestUtils.toList(),
-                TestUtils.toList(),
-                false,
-                false,
-                0,
-                TestUtils.toList()),
+            new Cors.Builder()
+                .allowedOrigins("*")
+                .build(),
             Method.PUT,
             false));
 
@@ -577,11 +488,8 @@ class CorsTest {
         .map(testCase -> DynamicTest.dynamicTest(
             testCase.name,
             () -> {
-
-              TestCors cors = new TestCors(testCase.options);
-
               boolean actual =
-                  cors.testIsMethodAllowed(testCase.testMethod.toString());
+                  testCase.cors.isMethodAllowed(testCase.testMethod.toString());
               assertEquals(testCase.isAllowed, actual);
             }));
   }
@@ -592,14 +500,9 @@ class CorsTest {
     ArrayList<OriginTestCase> testCases = TestUtils.toList(
         new OriginTestCase(
             "ExplicitOrigin",
-            new CorsOptions(
-                TestUtils.toList("http://foo.com", "http://bar.com", "baz.com"),
-                TestUtils.toList(),
-                TestUtils.toList(),
-                false,
-                false,
-                0,
-                TestUtils.toList()),
+            new Cors.Builder()
+                .allowedOrigins("http://foo.com", "http://bar.com", "baz.com")
+                .build(),
             Map.of(
                 "http://foo.com", true,
                 "http://bar.com", true,
@@ -610,14 +513,9 @@ class CorsTest {
 
         new OriginTestCase(
             "WildcardOrigin",
-            new CorsOptions(
-                TestUtils.toList("*"),
-                TestUtils.toList(),
-                TestUtils.toList(),
-                false,
-                false,
-                0,
-                TestUtils.toList()),
+            new Cors.Builder()
+                .allowedOrigins("*")
+                .build(),
             Map.of(
                 "http://foo.com", true,
                 "http://bar.com", true,
@@ -632,12 +530,9 @@ class CorsTest {
         .map(testCase -> DynamicTest.dynamicTest(
             testCase.name,
             () -> {
-
-              TestCors cors = new TestCors(testCase.options);
-
               // Test each origin and eval against the expected result.
               for (Entry<String, Boolean> entry : testCase.tests.entrySet()) {
-                boolean actual = cors.testIsOriginAllowed(entry.getKey());
+                boolean actual = testCase.cors.isOriginAllowed(entry.getKey());
                 assertEquals(entry.getValue(), actual);
               }
             }));

@@ -67,7 +67,7 @@ public class Router implements HttpHandler {
       handler = next.handle(handler);
     }
 
-    handler.handle(exchange, null);
+    handler.handle(exchange, new RouteContext(result.parameters()));
 
     exchange.close();
   }
@@ -90,8 +90,7 @@ public class Router implements HttpHandler {
    *        middleware, or else it must handle and close the HttpExchange.
    * @throws InvalidRouteClassException Unchecked RuntimeException.
    */
-  public void register(ArrayList<Method> methods, String path,
-      RouteHandler handler,
+  public void register(ArrayList<Method> methods, String path, RouteHandler handler,
       ArrayList<Middleware> middlewares) {
     // @todo test and research whether this is best practice
     if (middlewares == null) {
@@ -123,7 +122,7 @@ public class Router implements HttpHandler {
 
           java.lang.reflect.Method maybeHandler = instance
               .getClass()
-              .getDeclaredMethod(method.getName(), HttpExchange.class);
+              .getDeclaredMethod(method.getName(), HttpExchange.class, RouteContext.class);
 
           if (!maybeHandler.canAccess(instance)) {
             break;
@@ -131,7 +130,7 @@ public class Router implements HttpHandler {
 
           RouteHandler handler = (exchange, context) -> {
             try {
-              maybeHandler.invoke(instance, exchange);
+              maybeHandler.invoke(instance, exchange, context);
             } catch (InvocationTargetException e) {
               e.printStackTrace();
               exchange.close();
@@ -148,12 +147,29 @@ public class Router implements HttpHandler {
               new ArrayList<>());
 
         } catch (Exception e) {
-          e.printStackTrace();
-
           throw new InvalidRouteClassException(e);
         }
       }
     }
+  }
+
+  /**
+   * Set the 404 Not Found fallback handler.
+   *
+   * @param handler A RouteHandler to be executed when no route match can be found.
+   */
+  public void handleNotFoundWith(RouteHandler handler) {
+    this.notFoundHandler = handler;
+  }
+
+  /**
+   * Set the 405 Method Not Allowed fallback handler.
+   *
+   * @param handler A RouteHandler to be executed when a route match was found but not for the
+   *        requested HTTP method.
+   */
+  public void handleMethodNotAllowedWith(RouteHandler handler) {
+    this.methodNotAllowedHandler = handler;
   }
 
   /**
