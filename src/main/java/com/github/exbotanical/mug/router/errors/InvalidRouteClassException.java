@@ -5,7 +5,7 @@ package com.github.exbotanical.mug.router.errors;
  * `Router.use`.
  */
 public class InvalidRouteClassException extends RuntimeException {
-  public InvalidRouteClassException(Throwable cause) {
+  public InvalidRouteClassException(final Throwable cause) {
     super("Invalid route class or handler method.", cause);
   }
 }

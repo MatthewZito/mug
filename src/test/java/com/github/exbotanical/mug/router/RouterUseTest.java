@@ -3,7 +3,6 @@ package com.github.exbotanical.mug.router;
 import static com.github.exbotanical.mug.router.TestUtils.SearchQuery;
 import static com.github.exbotanical.mug.router.TestUtils.TestCase;
 import static com.github.exbotanical.mug.router.TestUtils.TestRouter;
-import static com.github.exbotanical.mug.router.TestUtils.toList;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
@@ -18,6 +17,7 @@ import com.sun.net.httpserver.HttpExchange;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -30,52 +30,14 @@ import org.junit.jupiter.api.TestFactory;
 @DisplayName("Test http router/multiplexer `use` method")
 public class RouterUseTest {
   /**
-   * Container for storing more metadata in TestCase.
-   */
-  public static record Expected(RouteHandler handler, int invocations) {
-
-  }
-
-  /**
    * Spies for use in auto-registration via `use`.
    */
 
-  public static RouteHandler handlerSpy = spy(RouteHandler.class);
-
-  public static RouteHandler handlerSpy2 = spy(RouteHandler.class);
-
-  public static RouteHandler handlerSpy3 = spy(RouteHandler.class);
-
-  public static RouteHandler handlerSpy4 = spy(RouteHandler.class);
-
-  /**
-   * Implements a routes configuration for use with `Router.use`.
-   */
-  public static class TestRoutes {
-    @Route(method = Method.GET, path = "/")
-    @Route(method = Method.GET, path = "/foo")
-    public void handlerA(HttpExchange exchange, RouteContext context) throws IOException {
-      handlerSpy.handle(exchange, context);
-    }
-
-    @Route(method = Method.POST, path = "/")
-    public void handlerB(HttpExchange exchange, RouteContext context) throws IOException {
-      handlerSpy2.handle(exchange, context);
-    }
-
-    @Route(method = Method.GET, path = "/api")
-    @Route(method = Method.GET, path = "/foo/bar")
-    public void handlerC(HttpExchange exchange, RouteContext context) throws IOException {
-      handlerSpy3.handle(exchange, context);
-    }
-
-    @Route(method = Method.GET, path = "/dev/api")
-    public void handlerD(HttpExchange exchange, RouteContext context) throws IOException {
-      handlerSpy4.handle(exchange, context);
-    }
-  }
-
-  TestRouter testRouter;
+  private static final RouteHandler handlerSpy = spy(RouteHandler.class);
+  private static final RouteHandler handlerSpy2 = spy(RouteHandler.class);
+  private static final RouteHandler handlerSpy3 = spy(RouteHandler.class);
+  private static final RouteHandler handlerSpy4 = spy(RouteHandler.class);
+  static TestRouter testRouter;
 
   @BeforeEach
   void setUp() {
@@ -88,9 +50,9 @@ public class RouterUseTest {
     // Auto-register the routes.
     testRouter.use(TestRoutes.class);
 
-    PathTrie trie = testRouter.getTrie();
+    final PathTrie trie = testRouter.getTrie();
 
-    ArrayList<TestCase<?>> testCases = toList(
+    final List<TestCase<?>> testCases = List.of(
         new TestCase<>(
             "SearchRootHandler",
             new SearchQuery(Method.GET, "/"), null),
@@ -117,11 +79,11 @@ public class RouterUseTest {
   @DisplayName("Test correct route handler from `use` is matched and invoke upon request receipt")
   @TestFactory
   Stream<DynamicTest> shouldMatchAndInvokeRegisteredRoutesFromUse() {
-    TestRouter testRouter = new TestRouter();
+    final TestRouter testRouter = new TestRouter();
 
     testRouter.use(TestRoutes.class);
 
-    ArrayList<TestCase<Expected>> testCases = toList(
+    final List<TestCase<Expected>> testCases = List.of(
         new TestCase<>(
             "InvokeRootHandler",
             new SearchQuery(Method.GET, "/"), new Expected(RouterUseTest.handlerSpy, 1)),
@@ -145,7 +107,7 @@ public class RouterUseTest {
 
     // We must use the same mock instance here, otherwise `verify` will resolve a different counter
     // for invocations by reference.
-    HttpExchange exchangeMock = mock(HttpExchange.class);
+    final HttpExchange exchangeMock = mock(HttpExchange.class);
 
     return testCases
         .stream()
@@ -153,9 +115,8 @@ public class RouterUseTest {
             testCase.name(),
             () -> {
               // Grab the query details.
-              SearchQuery query = testCase.input();
-              Expected expected = testCase.expected();
-
+              final SearchQuery query = testCase.input();
+              final Expected expected = testCase.expected();
 
               try {
                 when(exchangeMock.getRequestURI())
@@ -170,5 +131,43 @@ public class RouterUseTest {
                 fail("Did not expect an exception.", e);
               }
             }));
+  }
+
+  /**
+   * Container for storing more metadata in TestCase.
+   */
+  private record Expected(RouteHandler handler, int invocations) {
+
+  }
+
+  /**
+   * Implements a routes configuration for use with `Router.use`.
+   */
+  public static class TestRoutes {
+    @Route(method = Method.GET, path = "/")
+    @Route(method = Method.GET, path = "/foo")
+    public void handlerA(final HttpExchange exchange, final RouteContext context)
+        throws IOException {
+      handlerSpy.handle(exchange, context);
+    }
+
+    @Route(method = Method.POST, path = "/")
+    public void handlerB(final HttpExchange exchange, final RouteContext context)
+        throws IOException {
+      handlerSpy2.handle(exchange, context);
+    }
+
+    @Route(method = Method.GET, path = "/api")
+    @Route(method = Method.GET, path = "/foo/bar")
+    public void handlerC(final HttpExchange exchange, final RouteContext context)
+        throws IOException {
+      handlerSpy3.handle(exchange, context);
+    }
+
+    @Route(method = Method.GET, path = "/dev/api")
+    public void handlerD(final HttpExchange exchange, final RouteContext context)
+        throws IOException {
+      handlerSpy4.handle(exchange, context);
+    }
   }
 }

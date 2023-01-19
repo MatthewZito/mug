@@ -3,7 +3,6 @@ package com.github.exbotanical.mug.cors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import com.github.exbotanical.mug.router.TestUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,8 +18,8 @@ class NullSafeTest {
   @DisplayName("Test NullSafe.getFirst with Map")
   @Test
   void shouldBeNullSafeGetFirstMappable() {
-    HashMap<String, List<String>> m = new HashMap<>();
-    m.put("test", TestUtils.toList("value1", "value2"));
+    final HashMap<String, List<String>> m = new HashMap<>();
+    m.put("test", List.of("value1", "value2"));
 
     assertEquals("value1", NullSafe.getFirst(m, "test"));
     assertNull(NullSafe.getFirst(m, "test2"));
@@ -29,7 +28,7 @@ class NullSafeTest {
   @DisplayName("Test NullSafe.getFirst with List")
   @Test
   void shouldBeNullSafeGetFirstListable() {
-    ArrayList<String> l = new ArrayList<>();
+    final List<String> l = new ArrayList<>();
 
     assertNull(NullSafe.getFirst(l));
 

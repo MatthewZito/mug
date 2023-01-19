@@ -10,7 +10,7 @@ class RegexCache {
   /**
    * Thread-safe state mapping string patterns to their corresponding pre-compiled regex Patterns.
    */
-  ConcurrentHashMap<String, Pattern> state;
+  final ConcurrentHashMap<String, Pattern> state;
 
   RegexCache() {
     this.state = new ConcurrentHashMap<>();
@@ -23,15 +23,7 @@ class RegexCache {
    * @param pattern A string pattern and valid regular expression.
    * @return A compiled regex Pattern.
    */
-  synchronized Pattern get(String pattern) {
-    Pattern regex = this.state.get(pattern);
-    if (regex != null) {
-      return regex;
-    }
-
-    Pattern newRegex = Pattern.compile(pattern);
-
-    this.state.put(pattern, newRegex);
-    return newRegex;
+  synchronized Pattern get(final String pattern) {
+    return this.state.computeIfAbsent(pattern, Pattern::compile);
   }
 }

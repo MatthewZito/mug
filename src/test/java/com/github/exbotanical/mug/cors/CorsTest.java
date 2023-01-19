@@ -8,12 +8,11 @@ import static org.mockito.Mockito.when;
 
 import com.github.exbotanical.mug.constant.Method;
 import com.github.exbotanical.mug.constant.Status;
-import com.github.exbotanical.mug.router.TestUtils;
 import com.github.exbotanical.mug.router.TestUtils.ExchangeMockFactory;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
@@ -27,7 +26,7 @@ import org.junit.jupiter.api.TestFactory;
  */
 @DisplayName("Test Cors")
 class CorsTest {
-  static record CorsTestCase(
+  record CorsTestCase(
       String name,
       Cors cors,
       Method method,
@@ -36,33 +35,32 @@ class CorsTest {
       int code) {
   }
 
-  static record HeaderTestCase(
+  record HeaderTestCase(
       String name,
       Cors cors,
-      ArrayList<String> testHeaders,
+      List<String> testHeaders,
       boolean isAllowed) {
   }
 
-  static record MethodTestCase(
+  record MethodTestCase(
       String name,
       Cors cors,
       Method testMethod,
       boolean isAllowed) {
   }
 
-  static record OriginTestCase(
+  record OriginTestCase(
       String name,
       Cors cors,
       Map<String, Boolean> tests) {
   }
 
-  HttpHandler testHandler = (HttpExchange exchange) -> {
-  };
+  HttpHandler testHandler = (HttpExchange exchange) -> {};
 
   @DisplayName("Test CORS impl")
   @TestFactory
   Stream<DynamicTest> shouldProcessCorsRequest() {
-    ArrayList<CorsTestCase> testCases = TestUtils.toList(
+    final List<CorsTestCase> testCases = List.of(
         new CorsTestCase(
             "AllOriginAllowed",
             new Cors.Builder()
@@ -336,7 +334,7 @@ class CorsTest {
   @DisplayName("Test validate allowed headers")
   @TestFactory
   Stream<DynamicTest> shouldValidateAllowedHeaders() {
-    ArrayList<HeaderTestCase> testCases = TestUtils.toList(
+    final List<HeaderTestCase> testCases = List.of(
         new HeaderTestCase(
             "ExplicitHeaders",
             new Cors.Builder()
@@ -344,7 +342,7 @@ class CorsTest {
                 .allowedHeaders("x-test-1",
                     "x-test-2")
                 .build(),
-            TestUtils.toList("x-test-1", "x-test-2"),
+            List.of("x-test-1", "x-test-2"),
             true),
 
         new HeaderTestCase(
@@ -353,7 +351,7 @@ class CorsTest {
                 .allowedOrigins("*")
                 .allowedHeaders("x-test-1", "x-test-2")
                 .build(),
-            TestUtils.toList("x-test",
+            List.of("x-test",
                 "x-test-1",
                 "x-test-2"),
             false),
@@ -364,7 +362,7 @@ class CorsTest {
                 .allowedOrigins("*")
                 .allowedHeaders("x-test-1", "x-test-2")
                 .build(),
-            TestUtils.toList(""),
+            List.of(""),
             false),
 
         new HeaderTestCase(
@@ -373,7 +371,7 @@ class CorsTest {
                 .allowedOrigins("*")
                 .allowedHeaders("*")
                 .build(),
-            TestUtils.toList("x-test-1", "x-test-2"),
+            List.of("x-test-1", "x-test-2"),
             true),
 
         new HeaderTestCase(
@@ -382,7 +380,7 @@ class CorsTest {
                 .allowedOrigins("*")
                 .allowedHeaders("*")
                 .build(),
-            TestUtils.toList("x-test", "x-test-1", "x-test-2"),
+            List.of("x-test", "x-test-1", "x-test-2"),
             true),
 
         new HeaderTestCase(
@@ -391,7 +389,7 @@ class CorsTest {
                 .allowedOrigins("*")
                 .allowedHeaders("*")
                 .build(),
-            TestUtils.toList(""),
+            List.of(""),
             true)
 
     );
@@ -408,7 +406,7 @@ class CorsTest {
   @DisplayName("Test validate allowed methods")
   @TestFactory
   Stream<DynamicTest> shouldValidateAllowedMethods() {
-    ArrayList<MethodTestCase> testCases = TestUtils.toList(
+    final List<MethodTestCase> testCases = List.of(
         new MethodTestCase(
             "ExplicitMethodOk",
             new Cors.Builder()
@@ -497,7 +495,7 @@ class CorsTest {
   @DisplayName("Test validate allowed origins")
   @TestFactory
   Stream<DynamicTest> shouldValidateAllowedOrigins() {
-    ArrayList<OriginTestCase> testCases = TestUtils.toList(
+    final List<OriginTestCase> testCases = List.of(
         new OriginTestCase(
             "ExplicitOrigin",
             new Cors.Builder()
@@ -531,8 +529,8 @@ class CorsTest {
             testCase.name,
             () -> {
               // Test each origin and eval against the expected result.
-              for (Entry<String, Boolean> entry : testCase.tests.entrySet()) {
-                boolean actual = testCase.cors.isOriginAllowed(entry.getKey());
+              for (final Entry<String, Boolean> entry : testCase.tests.entrySet()) {
+                final boolean actual = testCase.cors.isOriginAllowed(entry.getKey());
                 assertEquals(entry.getValue(), actual);
               }
             }));

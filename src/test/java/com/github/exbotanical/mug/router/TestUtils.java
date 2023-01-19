@@ -7,29 +7,33 @@ import com.github.exbotanical.mug.constant.Method;
 import com.github.exbotanical.mug.router.annotations.Route;
 import com.sun.net.httpserver.HttpExchange;
 import java.net.URI;
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Shared test utilities.
  */
 public final class TestUtils {
+  private TestUtils() {
+    throw new AssertionError("Non-instantiable");
+  }
+
   /**
    * A route record, for use with iterative PathTrie insertion during testing.
    */
-  public static record RouteRecord(String path, ArrayList<Method> methods, RouteHandler handler) {
+  public record RouteRecord(String path, List<Method> methods, RouteHandler handler) {
   }
 
   /**
    * A search query record, for application against a PathTrie.
    */
-  public static record SearchQuery(Method method, String path) {
+  public record SearchQuery(Method method, String path) {
 
   }
 
   /**
    * A test case record.
    */
-  public static record TestCase<T> (String name, SearchQuery input, T expected) {
+  public record TestCase<T>(String name, SearchQuery input, T expected) {
 
   }
 
@@ -46,29 +50,37 @@ public final class TestUtils {
    * A route handlers class for testing auto-registration via `use`.
    */
   public static class TestRoute {
+    public TestRoute() {
+    }
+
     @Route(method = Method.GET, path = "/")
-    public void handlerA(HttpExchange exchange, RouteContext context) {}
+    public void handlerA(HttpExchange exchange, RouteContext context) {
+    }
 
     @Route(method = Method.POST, path = "/")
-    public void handlerB(HttpExchange exchange, RouteContext context) {}
+    private void handlerB(HttpExchange exchange, RouteContext context) {
+    }
 
     @Route(method = Method.GET, path = "/api")
-    public void handlerC(HttpExchange exchange, RouteContext context) {}
+    public void handlerC(HttpExchange exchange, RouteContext context) {
+    }
 
     @Route(method = Method.GET, path = "/dev/api")
-    public void handlerD(HttpExchange exchange, RouteContext context) {}
-
-    public TestRoute() {}
+    private void handlerD(HttpExchange exchange, RouteContext context) {
+    }
   }
 
   /**
    * Factory for mock HttpExchange objects.
    */
   public static class ExchangeMockFactory {
+    private ExchangeMockFactory() {
+    }
+
     /**
      * Build a new HttpExchange mock.
      *
-     * @param url The request URL of the exchange.
+     * @param url    The request URL of the exchange.
      * @param method The request method of the exchange.
      * @return HttpExchange mock.
      */
@@ -87,27 +99,5 @@ public final class TestUtils {
 
       return exchangeMock;
     }
-  }
-
-  /**
-   * Add n values to an ArrayList.
-   *
-   * @param <T> Element type.
-   * @param vals Values to add.
-   * @return ArrayList containing values `vals`.
-   */
-  @SafeVarargs
-  public static <T> ArrayList<T> toList(T... vals) {
-    ArrayList<T> list = new ArrayList<>();
-
-    for (T val : vals) {
-      list.add(val);
-    }
-
-    return list;
-  }
-
-  private TestUtils() {
-    throw new AssertionError("Non-instantiable");
   }
 }

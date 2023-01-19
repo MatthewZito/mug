@@ -15,5 +15,5 @@ public interface RouteHandler {
    * @param context A context object containing metadata and parameter matches for the route.
    * @throws IOException Exchange read/write exceptions.
    */
-  public void handle(HttpExchange exchange, final RouteContext context) throws IOException;
+  public void handle(final HttpExchange exchange, final RouteContext context) throws IOException;
 }

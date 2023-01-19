@@ -3,7 +3,6 @@ package com.github.exbotanical.mug.router;
 import static com.github.exbotanical.mug.router.TestUtils.RouteRecord;
 import static com.github.exbotanical.mug.router.TestUtils.SearchQuery;
 import static com.github.exbotanical.mug.router.TestUtils.TestCase;
-import static com.github.exbotanical.mug.router.TestUtils.toList;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -11,6 +10,7 @@ import com.github.exbotanical.mug.constant.Method;
 import com.github.exbotanical.mug.constant.Path;
 import com.github.exbotanical.mug.router.middleware.Middleware;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
@@ -20,36 +20,34 @@ import org.junit.jupiter.api.TestFactory;
 @DisplayName("Test PathTrie implementation")
 class PathTrieTest {
 
-  static class TestMiddleware implements Middleware {
+  static final class TestMiddleware implements Middleware {
     @Override
-    public RouteHandler handle(RouteHandler handler) {
-      return (exchange, context) -> {
-        handler.handle(exchange, context);
-      };
+    public RouteHandler handle(final RouteHandler handler) {
+      return handler;
     }
   }
 
   @DisplayName("Test insert does not throw")
   @Test
   void shouldInsertRouteRecord() {
-    RouteHandler testHandler = (exchange, context) -> {
+    final RouteHandler testHandler = (exchange, context) -> {
     };
 
-    ArrayList<RouteRecord> records = toList(
-        new RouteRecord(Path.ROOT.value, toList(Method.GET),
+    final List<RouteRecord> records = List.of(
+        new RouteRecord(Path.ROOT.value, List.of(Method.GET),
             testHandler),
-        new RouteRecord(Path.ROOT.value, toList(Method.GET,
+        new RouteRecord(Path.ROOT.value, List.of(Method.GET,
             Method.POST), testHandler),
-        new RouteRecord("/test", toList(Method.GET), testHandler),
-        new RouteRecord("/test/path", toList(Method.GET), testHandler),
-        new RouteRecord("/test/path", toList(Method.POST), testHandler),
-        new RouteRecord("/test/path/paths", toList(Method.GET),
+        new RouteRecord("/test", List.of(Method.GET), testHandler),
+        new RouteRecord("/test/path", List.of(Method.GET), testHandler),
+        new RouteRecord("/test/path", List.of(Method.POST), testHandler),
+        new RouteRecord("/test/path/paths", List.of(Method.GET),
             testHandler),
-        new RouteRecord("/foo/bar", toList(Method.GET), testHandler));
+        new RouteRecord("/foo/bar", List.of(Method.GET), testHandler));
 
-    PathTrie trie = new PathTrie();
+    final PathTrie trie = new PathTrie();
 
-    for (RouteRecord record : records) {
+    for (final RouteRecord record : records) {
       assertDoesNotThrow(() -> trie.insert(
           record.methods(),
           record.path(),
@@ -64,25 +62,25 @@ class PathTrieTest {
   @DisplayName("Test search")
   @TestFactory
   Stream<DynamicTest> shouldYieldSearchResults() {
-    RouteHandler testHandler = (exchange, context) -> {
+    final RouteHandler testHandler = (exchange, context) -> {
     };
 
-    ArrayList<RouteRecord> records = toList(
-        new RouteRecord(Path.ROOT.value, toList(Method.GET),
+    final List<RouteRecord> records = List.of(
+        new RouteRecord(Path.ROOT.value, List.of(Method.GET),
             testHandler),
-        new RouteRecord("/test", toList(Method.GET), testHandler),
-        new RouteRecord("/test/path", toList(Method.GET), testHandler),
-        new RouteRecord("/test/path", toList(Method.POST), testHandler),
-        new RouteRecord("/test/path/paths", toList(Method.GET),
+        new RouteRecord("/test", List.of(Method.GET), testHandler),
+        new RouteRecord("/test/path", List.of(Method.GET), testHandler),
+        new RouteRecord("/test/path", List.of(Method.POST), testHandler),
+        new RouteRecord("/test/path/paths", List.of(Method.GET),
             testHandler),
-        new RouteRecord("/test/path/:id[^\\d+$]", toList(Method.GET),
+        new RouteRecord("/test/path/:id[^\\d+$]", List.of(Method.GET),
             testHandler),
-        new RouteRecord("/foo", toList(Method.GET), testHandler),
+        new RouteRecord("/foo", List.of(Method.GET), testHandler),
         new RouteRecord("/bar/:id[^\\d+$]/:user[^\\D+$]",
-            toList(Method.POST), testHandler),
-        new RouteRecord("/:*[(.+)]", toList(Method.OPTIONS), testHandler));
+            List.of(Method.POST), testHandler),
+        new RouteRecord("/:*[(.+)]", List.of(Method.OPTIONS), testHandler));
 
-    ArrayList<TestCase<SearchResult>> testCases = toList(
+    final List<TestCase<SearchResult>> testCases = List.of(
         new TestCase<>(
             "SearchRoot",
             new SearchQuery(Method.GET, "/"),
@@ -102,7 +100,7 @@ class PathTrieTest {
             new SearchQuery(Method.GET, "/test/path/12"),
             new SearchResult(
                 new Action(testHandler, new ArrayList<>()),
-                toList(new Parameter("id", "12")))),
+                List.of(new Parameter("id", "12")))),
 
         new TestCase<>(
             "SearchNestedPath",
@@ -144,7 +142,7 @@ class PathTrieTest {
             new SearchQuery(Method.POST, "/bar/123/alice"),
             new SearchResult(
                 new Action(testHandler, new ArrayList<>()),
-                toList(new Parameter("id", "123"),
+                List.of(new Parameter("id", "123"),
                     new Parameter("user",
                         "alice")))),
 
@@ -153,13 +151,13 @@ class PathTrieTest {
             new SearchQuery(Method.OPTIONS, "/wildcard"),
             new SearchResult(
                 new Action(testHandler, new ArrayList<>()),
-                toList(new Parameter("*",
+                List.of(new Parameter("*",
                     "wildcard"))))
 
     );
 
-    PathTrie trie = new PathTrie();
-    for (RouteRecord record : records) {
+    final PathTrie trie = new PathTrie();
+    for (final RouteRecord record : records) {
       trie.insert(record.methods(), record.path(), record.handler(), new ArrayList<>());
     }
 

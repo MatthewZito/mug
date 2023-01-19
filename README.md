@@ -40,17 +40,17 @@ public class Demo {
     // Register the route handler + middleware at GET "/api".
     router.register(
       // A list of HTTP methods at which to register this handler.
-      new ArrayList<>(Arrays.asList(Method.GET)),
+      List.of(Method.GET),
       // The path at which this handler should be executed.
       "/api",
       // The route handler.
       routeHandler,
       // A list of Middleware to be invoked before and/or after the handler.
-      new ArrayList<Middleware>(Arrays.asList(mw))
+      List.of(mw)
     );
 
     try {
-      // Create a new server that listens on port PORT and uses the Router.
+      // Create a new server that listens on port `PORT` and uses the Router.
       Server server = new Server(PORT, router);
 
       // Start the server.
@@ -165,7 +165,7 @@ Middleware mw2 = new Middleware() {
 Router router = new Router();
 
 router.register(
-  new ArrayList<>(Arrays.asList(Method.GET)),
+  List.ofMethod.GET),
   "/api",
   apiHandler,
   new ArrayList<Middleware>(Arrays.asList(mw, mw2))

@@ -9,5 +9,5 @@ import com.github.exbotanical.mug.router.RouteHandler;
  */
 @FunctionalInterface
 public interface Middleware {
-  public RouteHandler handle(RouteHandler handler);
+  public RouteHandler handle(final RouteHandler handler);
 }

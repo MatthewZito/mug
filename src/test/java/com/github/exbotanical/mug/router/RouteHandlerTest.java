@@ -5,45 +5,41 @@ import static com.github.exbotanical.mug.router.TestUtils.RouteRecord;
 import static com.github.exbotanical.mug.router.TestUtils.SearchQuery;
 import static com.github.exbotanical.mug.router.TestUtils.TestCase;
 import static com.github.exbotanical.mug.router.TestUtils.TestRouter;
-import static com.github.exbotanical.mug.router.TestUtils.toList;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.github.exbotanical.mug.constant.Method;
+import com.github.exbotanical.mug.router.annotations.Route;
 import com.sun.net.httpserver.HttpExchange;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 
 @DisplayName("Test RouteHandler and RouteContext")
 class RouteHandlerTest {
   /**
-   * Container for storing more metadata in TestCase.
-   */
-  static record Expected(RouteHandler handler, RouteContext context) {
-
-  }
-
-  TestRouter testRouter;
-
-
-  /**
    * Spies for use in auto-registration via `use`.
    */
 
-  public static RouteHandler handlerSpy = spy(RouteHandler.class);
+  private static final RouteHandler handlerSpy = spy(RouteHandler.class);
 
-  public static RouteHandler handlerSpy2 = spy(RouteHandler.class);
+  private static final RouteHandler handlerSpy2 = spy(RouteHandler.class);
 
-  public static RouteHandler handlerSpy3 = spy(RouteHandler.class);
+  private static final RouteHandler handlerSpy3 = spy(RouteHandler.class);
 
-  public static RouteHandler handlerSpy4 = spy(RouteHandler.class);
+  private static final RouteHandler handlerSpy4 = spy(RouteHandler.class);
 
+  private static TestRouter testRouter;
 
   @BeforeEach
   void setUp() {
@@ -53,24 +49,7 @@ class RouteHandlerTest {
   @DisplayName("Test route handler receives context")
   @TestFactory
   Stream<DynamicTest> shouldReceiveRouteContext() {
-    RouteHandler testHandler = (exchange, context) -> {
-      handlerSpy.handle(exchange, context);
-    };
-
-    RouteHandler testHandler2 = (exchange, context) -> {
-      handlerSpy2.handle(exchange, context);
-    };
-
-    RouteHandler testHandler3 = (exchange, context) -> {
-      handlerSpy3.handle(exchange, context);
-    };
-
-    RouteHandler testHandler4 = (exchange, context) -> {
-      handlerSpy4.handle(exchange, context);
-    };
-
-
-    ArrayList<TestCase<Expected>> testCases = toList(
+    final List<TestCase<Expected>> testCases = List.of(
         new TestCase<>(
             "RootHandler",
             new SearchQuery(Method.GET, "/"),
@@ -85,24 +64,24 @@ class RouteHandlerTest {
             "WithParams",
             new SearchQuery(Method.GET, "/dev/123"),
             new Expected(handlerSpy3, new RouteContext(
-                toList(new Parameter("key", "123"))))),
+                List.of(new Parameter("key", "123"))))),
 
         new TestCase<>(
             "NestedPathWithParams",
             new SearchQuery(Method.GET, "/api/users/user1"),
             new Expected(handlerSpy4, new RouteContext(
-                toList(new Parameter("id", "user1")))))
+                List.of(new Parameter("id", "user1")))))
 
     );
 
-    ArrayList<RouteRecord> records = toList(
-        new RouteRecord("/", toList(Method.GET),
-            testHandler),
-        new RouteRecord("/", toList(Method.POST), testHandler2),
-        new RouteRecord("/dev/:key[^\\d+$]", toList(Method.GET), testHandler3),
-        new RouteRecord("/api/users/:id[(.+)]", toList(Method.GET), testHandler4));
+    final List<RouteRecord> records = List.of(
+        new RouteRecord("/", List.of(Method.GET),
+            handlerSpy),
+        new RouteRecord("/", List.of(Method.POST), handlerSpy2),
+        new RouteRecord("/dev/:key[^\\d+$]", List.of(Method.GET), handlerSpy3),
+        new RouteRecord("/api/users/:id[(.+)]", List.of(Method.GET), handlerSpy4));
 
-    for (RouteRecord record : records) {
+    for (final RouteRecord record : records) {
       testRouter.register(
           record.methods(),
           record.path(),
@@ -116,26 +95,62 @@ class RouteHandlerTest {
                 testCase.name(),
                 () -> {
                   // Grab the query details.
-                  SearchQuery query = testCase.input();
-                  Expected expected = testCase.expected();
+                  final SearchQuery query = testCase.input();
+                  final Expected expected = testCase.expected();
 
                   try {
-                    HttpExchange exchangeMock =
+                    final HttpExchange exchangeMock =
                         ExchangeMockFactory.build("http://test.com" + query.path(),
                             query.method());
 
                     // Invoke the handler with the mock request.
+                    assert exchangeMock != null;
                     testRouter.handle(exchangeMock);
                     // Assert the matched handler was resolved and invoked with the expected
                     // arguments.
                     verify(
                         expected.handler,
                         times(1)).handle(
-                            exchangeMock,
-                            expected.context);
+                        exchangeMock,
+                        expected.context);
                   } catch (Exception e) {
                     fail("Did not expect an exception.", e);
                   }
                 }));
+  }
+
+  @DisplayName("Test usage of private router classes and methods")
+  @Test
+  void shouldInvokePrivateClassAndMethods() throws IOException {
+    testRouter.use(PrivateTestRoute.class);
+
+    final HttpExchange exchangeMock =
+        ExchangeMockFactory.build("http://test.com" + "/", Method.GET);
+
+    assert exchangeMock != null;
+    assertDoesNotThrow(() -> testRouter.handle(exchangeMock));
+
+    verify(
+        handlerSpy,
+        times(1)).handle(
+        any(HttpExchange.class),
+        any(RouteContext.class));
+  }
+
+  private static class PrivateTestRoute {
+    private PrivateTestRoute() {
+    }
+
+    @Route(method = Method.GET, path = "/")
+    public void handlerA(HttpExchange exchange, RouteContext context) throws IOException {
+      handlerSpy.handle(exchange, context);
+    }
+  }
+
+  /**
+   * Container for storing more metadata in TestCase.
+   */
+  private record Expected(RouteHandler handler, RouteContext context) {
+
   }
 }
