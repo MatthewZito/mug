@@ -2,8 +2,11 @@ package com.github.exbotanical.mug.server;
 
 import com.github.exbotanical.mug.constant.Path;
 import com.github.exbotanical.mug.router.middleware.AuthenticationMiddleware;
-import com.sun.net.httpserver.*;
-
+import com.sun.net.httpserver.Filter;
+import com.sun.net.httpserver.HttpContext;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.List;
@@ -28,7 +31,6 @@ public class Server {
    *
    * @param port        The port number at which the server will listen.
    * @param rootHandler The root HttpHandler to register.
-   *
    * @throws IOException Server initialization failed.
    */
   public Server(final int port, final HttpHandler rootHandler) throws IOException {
@@ -42,7 +44,6 @@ public class Server {
    *
    * @param authMiddleware The authentication middleware. Must implement the
    *                       AuthenticationMiddleware interface.
-   *                       <p>
    *                       TODO: Implement, test, document.
    */
   public void withAuthentication(final AuthenticationMiddleware authMiddleware) {

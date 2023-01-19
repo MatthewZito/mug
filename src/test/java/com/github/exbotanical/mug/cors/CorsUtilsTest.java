@@ -21,10 +21,6 @@ import org.junit.jupiter.api.TestFactory;
  */
 @DisplayName("Test CORS utilities")
 class CorsUtilsTest {
-  record TestCase<T> (String name, String input, T expected) {
-
-  }
-
   @DisplayName("Test deriveHeaders")
   @TestFactory
   Stream<DynamicTest> shouldDeriveHeaders() {
@@ -173,5 +169,9 @@ class CorsUtilsTest {
 
               assertEquals(testCase.expected, CorsUtils.isPreflightRequest(exchangeMock));
             }));
+  }
+
+  record TestCase<T>(String name, String input, T expected) {
+
   }
 }

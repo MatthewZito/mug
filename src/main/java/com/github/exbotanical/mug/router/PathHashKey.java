@@ -2,6 +2,10 @@ package com.github.exbotanical.mug.router;
 
 import java.util.Objects;
 
+
+/**
+ * A composite hash key for path/method.
+ */
 public class PathHashKey {
   private final String path;
 

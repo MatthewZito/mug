@@ -30,51 +30,13 @@ import org.junit.jupiter.api.TestFactory;
 @DisplayName("Test http router/multiplexer `use` method")
 public class RouterUseTest {
   /**
-   * Container for storing more metadata in TestCase.
-   */
-  private record Expected(RouteHandler handler, int invocations) {
-
-  }
-
-  /**
    * Spies for use in auto-registration via `use`.
    */
 
   private static final RouteHandler handlerSpy = spy(RouteHandler.class);
-
   private static final RouteHandler handlerSpy2 = spy(RouteHandler.class);
-
   private static final RouteHandler handlerSpy3 = spy(RouteHandler.class);
-
   private static final RouteHandler handlerSpy4 = spy(RouteHandler.class);
-
-  /**
-   * Implements a routes configuration for use with `Router.use`.
-   */
-  public static class TestRoutes {
-    @Route(method = Method.GET, path = "/")
-    @Route(method = Method.GET, path = "/foo")
-    public void handlerA(final HttpExchange exchange, final RouteContext context) throws IOException {
-      handlerSpy.handle(exchange, context);
-    }
-
-    @Route(method = Method.POST, path = "/")
-    public void handlerB(final HttpExchange exchange, final RouteContext context) throws IOException {
-      handlerSpy2.handle(exchange, context);
-    }
-
-    @Route(method = Method.GET, path = "/api")
-    @Route(method = Method.GET, path = "/foo/bar")
-    public void handlerC(final HttpExchange exchange, final RouteContext context) throws IOException {
-      handlerSpy3.handle(exchange, context);
-    }
-
-    @Route(method = Method.GET, path = "/dev/api")
-    public void handlerD(final HttpExchange exchange, final RouteContext context) throws IOException {
-      handlerSpy4.handle(exchange, context);
-    }
-  }
-
   static TestRouter testRouter;
 
   @BeforeEach
@@ -169,5 +131,43 @@ public class RouterUseTest {
                 fail("Did not expect an exception.", e);
               }
             }));
+  }
+
+  /**
+   * Container for storing more metadata in TestCase.
+   */
+  private record Expected(RouteHandler handler, int invocations) {
+
+  }
+
+  /**
+   * Implements a routes configuration for use with `Router.use`.
+   */
+  public static class TestRoutes {
+    @Route(method = Method.GET, path = "/")
+    @Route(method = Method.GET, path = "/foo")
+    public void handlerA(final HttpExchange exchange, final RouteContext context)
+        throws IOException {
+      handlerSpy.handle(exchange, context);
+    }
+
+    @Route(method = Method.POST, path = "/")
+    public void handlerB(final HttpExchange exchange, final RouteContext context)
+        throws IOException {
+      handlerSpy2.handle(exchange, context);
+    }
+
+    @Route(method = Method.GET, path = "/api")
+    @Route(method = Method.GET, path = "/foo/bar")
+    public void handlerC(final HttpExchange exchange, final RouteContext context)
+        throws IOException {
+      handlerSpy3.handle(exchange, context);
+    }
+
+    @Route(method = Method.GET, path = "/dev/api")
+    public void handlerD(final HttpExchange exchange, final RouteContext context)
+        throws IOException {
+      handlerSpy4.handle(exchange, context);
+    }
   }
 }

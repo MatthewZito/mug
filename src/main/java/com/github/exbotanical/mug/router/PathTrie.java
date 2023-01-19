@@ -5,7 +5,6 @@ import com.github.exbotanical.mug.constant.Path;
 import com.github.exbotanical.mug.router.errors.MethodNotAllowedException;
 import com.github.exbotanical.mug.router.errors.NotFoundException;
 import com.github.exbotanical.mug.router.middleware.Middleware;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -91,15 +90,13 @@ class PathTrie {
    *
    * @param method     The HTTP method for the matching route record.
    * @param searchPath The path to search.
-   *
    * @return A SearchResult record containing the matched route handler and any matching parameters.
-   *
    * @throws NotFoundException         A route match was not found.
    * @throws MethodNotAllowedException A route match was found, but not for the specified HTTP
    *                                   method.
    */
   SearchResult search(final Method method, final String searchPath)
-    throws NotFoundException, MethodNotAllowedException {
+      throws NotFoundException, MethodNotAllowedException {
     final PathHashKey hashKey = new PathHashKey(searchPath, method.name());
     if (pathCache.containsKey(new PathHashKey(searchPath, method.name()))) {
       return pathCache.get(hashKey);

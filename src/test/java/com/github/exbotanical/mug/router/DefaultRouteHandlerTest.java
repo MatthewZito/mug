@@ -13,7 +13,6 @@ import com.github.exbotanical.mug.constant.Status;
 import com.sun.net.httpserver.HttpExchange;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,7 +30,8 @@ class DefaultRouteHandlerTest {
   @Test
   void shouldInvokeDefaultNotFoundHandler() {
     try {
-      final HttpExchange exchangeMock = ExchangeMockFactory.build("http://test.com/api", Method.GET);
+      final HttpExchange exchangeMock =
+          ExchangeMockFactory.build("http://test.com/api", Method.GET);
 
       assert exchangeMock != null;
       testRouter.handle(exchangeMock);
@@ -70,15 +70,15 @@ class DefaultRouteHandlerTest {
     testRouter.handleNotFoundWith(notFoundSpy);
 
     try {
-      final HttpExchange exchangeMock = ExchangeMockFactory.build("http://test.com/api", Method.GET);
+      final HttpExchange exchangeMock =
+          ExchangeMockFactory.build("http://test.com/api", Method.GET);
       assert exchangeMock != null;
       testRouter.handle(exchangeMock);
 
       verify(
           notFoundSpy,
           times(1)).handle(
-              exchangeMock,
-              new RouteContext(new ArrayList<>()));
+          exchangeMock, new RouteContext(new ArrayList<>()));
     } catch (Exception e) {
       fail("Did not expect an exception.", e);
     }
@@ -95,15 +95,15 @@ class DefaultRouteHandlerTest {
     testRouter.register(List.of(Method.GET), "/api", handler, new ArrayList<>());
 
     try {
-      final HttpExchange exchangeMock = ExchangeMockFactory.build("http://test.com/api", Method.POST);
+      final HttpExchange exchangeMock =
+          ExchangeMockFactory.build("http://test.com/api", Method.POST);
       assert exchangeMock != null;
       testRouter.handle(exchangeMock);
 
       verify(
           notAllowedSpy,
           times(1)).handle(
-              exchangeMock,
-              new RouteContext(new ArrayList<>()));
+          exchangeMock, new RouteContext(new ArrayList<>()));
     } catch (Exception e) {
       fail("Did not expect an exception.", e);
     }

@@ -2,10 +2,9 @@ package com.github.exbotanical.mug.router;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 /**
  * Assert public objects stringify in a human-readable manner.

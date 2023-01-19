@@ -1,186 +1,188 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.github.exbotanical.mug</groupId>
-  <artifactId>mug</artifactId>
-  <version>0.0.2</version>
-  <packaging>jar</packaging>
+    <groupId>com.github.exbotanical.mug</groupId>
+    <artifactId>mug</artifactId>
+    <version>0.0.2</version>
+    <packaging>jar</packaging>
 
-  <name>mug</name>
-  <description>Mug is a simple, light-weight, and declarative server-side framework with support for routing, middleware and authentication/authorization</description>
+    <name>mug</name>
+    <description>Mug is a simple, light-weight, and declarative server-side framework with support for routing,
+        middleware and authentication/authorization
+    </description>
 
-  <url>http://www.github.com/exbotanical/mug</url>
-  <scm>
-    <connection>scm:git:git://github.com/exbotanical/mug.git</connection>
-    <developerConnection>scm:git:ssh://github.com:exbotanical/mug.git</developerConnection>
-    <url>http://github.com/exbotanical/mug</url>
-  </scm>
+    <url>http://www.github.com/exbotanical/mug</url>
+    <scm>
+        <connection>scm:git:git://github.com/exbotanical/mug.git</connection>
+        <developerConnection>scm:git:ssh://github.com:exbotanical/mug.git</developerConnection>
+        <url>http://github.com/exbotanical/mug</url>
+    </scm>
 
-  <licenses>
-    <license>
-      <name>MIT License</name>
-      <url>http://www.opensource.org/licenses/mit-license.php</url>
-    </license>
-  </licenses>
-  <developers>
-    <developer>
-      <name>Matthew Zito (goldmund)</name>
-      <organization>com.github.exbotanical</organization>
-      <organizationUrl>https://www.github.com/exbotanical</organizationUrl>
-    </developer>
-  </developers>
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>http://www.opensource.org/licenses/mit-license.php</url>
+        </license>
+    </licenses>
+    <developers>
+        <developer>
+            <name>Matthew Zito (goldmund)</name>
+            <organization>com.github.exbotanical</organization>
+            <organizationUrl>https://www.github.com/exbotanical</organizationUrl>
+        </developer>
+    </developers>
 
-  <distributionManagement>
-    <repository>
-      <id>github</id>
-      <name>GitHub Packages</name>
-      <url>https://maven.pkg.github.com/exbotanical/mug</url>
-    </repository>
-  </distributionManagement>
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/exbotanical/mug</url>
+        </repository>
+    </distributionManagement>
 
-  <properties>
-    <java.version>17</java.version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.package>com.github.exbotanical.mug</project.package>
-    <project.package.path>com/github/exbotanical/mug</project.package.path>
-    <project.github.repository>exbotanical/mug</project.github.repository>
-    <maven.compiler.source>17</maven.compiler.source>
-    <maven.compiler.target>17</maven.compiler.target>
-    <plugin.prettier.goal>write</plugin.prettier.goal>
-  </properties>
+    <properties>
+        <java.version>17</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.package>com.github.exbotanical.mug</project.package>
+        <project.package.path>com/github/exbotanical/mug</project.package.path>
+        <project.github.repository>exbotanical/mug</project.github.repository>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <plugin.prettier.goal>write</plugin.prettier.goal>
+    </properties>
 
-  <dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.junit</groupId>
-				<artifactId>junit-bom</artifactId>
-				<version>5.9.0</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
-
-  <dependencies>
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-core</artifactId>
-      <version>4.6.1</version>
-    </dependency>
-
-    <dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter</artifactId>
-			<scope>test</scope>
-		</dependency>
-  </dependencies>
-
-  <build>
-    <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
-      <plugins>
-         <plugin>
-          <artifactId>maven-clean-plugin</artifactId>
-          <version>3.1.0</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.8.0</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.22.1</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-install-plugin</artifactId>
-          <version>2.5.2</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-deploy-plugin</artifactId>
-          <version>2.8.2</version>
-        </plugin>
-
-        <!-- Checkstyle -->
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-checkstyle-plugin</artifactId>
-          <version>3.1.2</version>
-          <executions>
-            <execution>
-              <id>checkstyle</id>
-              <phase>validate</phase>
-              <goals>
-                <goal>check</goal>
-              </goals>
-            </execution>
-          </executions>
-          <configuration>
-            <configLocation>google_checks.xml</configLocation>
-            <failOnViolation>true</failOnViolation>
-            <enableFilesSummary>true</enableFilesSummary>
-            <violationSeverity>warning</violationSeverity>
-            <includeTestSourceDirectory>true</includeTestSourceDirectory>
-            <suppressionsLocation>checkstyle-suppressions.xml</suppressionsLocation>
-            <suppressionsFileExpression>checkstyle.suppressions.file</suppressionsFileExpression>
-          </configuration>
-          <dependencies>
+    <dependencyManagement>
+        <dependencies>
             <dependency>
-              <groupId>com.puppycrawl.tools</groupId>
-              <artifactId>checkstyle</artifactId>
-              <version>9.2</version>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>5.9.0</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
-          </dependencies>
-        </plugin>
+        </dependencies>
+    </dependencyManagement>
 
-        <!-- Checkstyle autofix -->
-        <plugin>
-          <groupId>org.openrewrite.maven</groupId>
-          <artifactId>rewrite-maven-plugin</artifactId>
-          <version>4.31.1</version>
-          <configuration>
-            <activeRecipes>
-              <recipe>org.openrewrite.java.cleanup.Cleanup</recipe>
-            </activeRecipes>
-          </configuration>
-        </plugin>
+    <dependencies>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>4.6.1</version>
+        </dependency>
 
-        <!-- Prettier -->
-        <plugin>
-          <groupId>com.hubspot.maven.plugins</groupId>
-          <artifactId>prettier-maven-plugin</artifactId>
-          <version>0.16</version>
-          <configuration>
-            <prettierJavaVersion>1.5.0</prettierJavaVersion>
-            <printWidth>120</printWidth>
-            <tabWidth>2</tabWidth>
-            <useTabs>false</useTabs>
-            <ignoreConfigFile>true</ignoreConfigFile>
-            <ignoreEditorConfig>true</ignoreEditorConfig>
-            <inputGlobs>
-              <inputGlob>src/main/java/**/*.java</inputGlob>
-              <inputGlob>src/test/java/**/*.java</inputGlob>
-            </inputGlobs>
-          </configuration>
-          <executions>
-            <execution>
-              <phase>validate</phase>
-              <goals>
-                <goal>${plugin.prettier.goal}</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-      </plugins>
-    </pluginManagement>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
-    <plugins>
-      <!-- Needed for JUnit -->
-      <plugin>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>3.0.0-M6</version>
-			</plugin>
-    </plugins>
-  </build>
+    <build>
+        <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
+            <plugins>
+                <plugin>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>3.1.0</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.8.0</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.22.1</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-install-plugin</artifactId>
+                    <version>2.5.2</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>2.8.2</version>
+                </plugin>
+
+                <!-- Checkstyle -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>3.1.2</version>
+                    <executions>
+                        <execution>
+                            <id>checkstyle</id>
+                            <phase>validate</phase>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <configLocation>google_checks.xml</configLocation>
+                        <failOnViolation>true</failOnViolation>
+                        <enableFilesSummary>true</enableFilesSummary>
+                        <violationSeverity>warning</violationSeverity>
+                        <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                        <suppressionsLocation>checkstyle-suppressions.xml</suppressionsLocation>
+                        <suppressionsFileExpression>checkstyle.suppressions.file</suppressionsFileExpression>
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.puppycrawl.tools</groupId>
+                            <artifactId>checkstyle</artifactId>
+                            <version>9.2</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+
+                <!-- Checkstyle autofix -->
+                <plugin>
+                    <groupId>org.openrewrite.maven</groupId>
+                    <artifactId>rewrite-maven-plugin</artifactId>
+                    <version>4.38.2</version>
+                    <configuration>
+                        <activeRecipes>
+                            <recipe>org.openrewrite.java.cleanup.Cleanup</recipe>
+                        </activeRecipes>
+                    </configuration>
+                </plugin>
+
+                <!-- Prettier -->
+                <plugin>
+                    <groupId>com.hubspot.maven.plugins</groupId>
+                    <artifactId>prettier-maven-plugin</artifactId>
+                    <version>0.16</version>
+                    <configuration>
+                        <prettierJavaVersion>1.5.0</prettierJavaVersion>
+                        <printWidth>120</printWidth>
+                        <tabWidth>2</tabWidth>
+                        <useTabs>false</useTabs>
+                        <ignoreConfigFile>true</ignoreConfigFile>
+                        <ignoreEditorConfig>true</ignoreEditorConfig>
+                        <inputGlobs>
+                            <inputGlob>src/main/java/**/*.java</inputGlob>
+                            <inputGlob>src/test/java/**/*.java</inputGlob>
+                        </inputGlobs>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <phase>validate</phase>
+                            <goals>
+                                <goal>${plugin.prettier.goal}</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <plugins>
+            <!-- Needed for JUnit -->
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.0.0-M6</version>
+            </plugin>
+        </plugins>
+    </build>
 </project>

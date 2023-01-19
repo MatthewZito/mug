@@ -3,7 +3,6 @@ package com.github.exbotanical.mug.cors;
 import com.github.exbotanical.mug.constant.Method;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,7 +29,6 @@ class CorsUtils {
    * </ul>
    *
    * @param exchange The HttpExchange containing the prospective Preflight request.
-   *
    * @return A boolean indicating whether the given request is a Preflight request.
    */
   static boolean isPreflightRequest(final HttpExchange exchange) {
@@ -42,9 +40,9 @@ class CorsUtils {
     final Headers reqHeaders = exchange.getRequestHeaders();
     // TODO: box these - they cannot be null
     final boolean hasOriginHeader =
-      NullSafe.getFirst(reqHeaders, CommonHeader.ORIGIN.value) != null;
+        NullSafe.getFirst(reqHeaders, CommonHeader.ORIGIN.value) != null;
     final boolean hasReqMethod =
-      NullSafe.getFirst(reqHeaders, CommonHeader.REQUEST_METHOD.value) != null;
+        NullSafe.getFirst(reqHeaders, CommonHeader.REQUEST_METHOD.value) != null;
 
     return hasOriginHeader && hasReqMethod;
   }
@@ -53,13 +51,12 @@ class CorsUtils {
    * Extracts headers from a given request's Access-Control-Request-Headers header.
    *
    * @param exchange The HttpExchange containing the request.
-   *
    * @return A list of requested headers.
    */
   static List<String> deriveHeaders(final HttpExchange exchange) {
     // TODO: evaluate whether `getRequestHeaders` needs to be null-checked
     final String headersStr =
-      NullSafe.getFirst(exchange.getRequestHeaders(), CommonHeader.REQUEST_HEADERS.value);
+        NullSafe.getFirst(exchange.getRequestHeaders(), CommonHeader.REQUEST_HEADERS.value);
     final List<String> headers = new ArrayList<>();
 
     if (headersStr == null || "".equals(headersStr)) {
@@ -83,8 +80,8 @@ class CorsUtils {
       if (c == ' ' || c == ',' || i == len - 1) {
         if (tmp.size() > 0) {
           String b = tmp.stream()
-            .map(Object::toString)
-            .collect(Collectors.joining());
+              .map(Object::toString)
+              .collect(Collectors.joining());
 
           headers.add(b);
 

@@ -9,7 +9,6 @@ import com.github.exbotanical.mug.router.errors.NotFoundException;
 import com.github.exbotanical.mug.router.middleware.Middleware;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -23,55 +22,32 @@ import java.util.List;
 public class Router implements HttpHandler {
 
   /**
+   * The route trie.
+   */
+  protected final PathTrie trie;
+  /**
    * Cache for instantiated routes classes.
    */
-  private static final HashMap<String, Object> routesClassCache = new HashMap<>();
-
+  private final HashMap<String, Object> routesClassCache = new HashMap<>();
   /**
    * The handler to be invoked when a route match is not found. Defaults to a 404
    * NotFound
    * empty-bodied response.
    */
-  private static RouteHandler notFoundHandler = (exchange, context) -> {
+  private RouteHandler notFoundHandler = (exchange, context) -> {
     exchange.sendResponseHeaders(Status.NOT_FOUND.value, -1);
   };
-
   /**
    * The handler to be invoked when a route match for the specific HTTP method is
    * not found.
    * Defaults to a 405 MethodNotAllowed empty-bodied response.
    */
-  private static RouteHandler methodNotAllowedHandler = (exchange, context) -> {
+  private RouteHandler methodNotAllowedHandler = (exchange, context) -> {
     exchange.sendResponseHeaders(Status.METHOD_NOT_ALLOWED.value, -1);
   };
 
-  /**
-   * The route trie.
-   */
-  protected final PathTrie trie;
-
   public Router() {
     trie = new PathTrie();
-  }
-
-  /**
-   * Set the 404 Not Found fallback handler.
-   *
-   * @param handler A RouteHandler to be executed when no route match can be
-   *                found.
-   */
-  public static void handleNotFoundWith(final RouteHandler handler) {
-    notFoundHandler = handler;
-  }
-
-  /**
-   * Set the 405 Method Not Allowed fallback handler.
-   *
-   * @param handler A RouteHandler to be executed when a route match was found but
-   *                not for the requested HTTP method.
-   */
-  public static void handleMethodNotAllowedWith(final RouteHandler handler) {
-    methodNotAllowedHandler = handler;
   }
 
   /**
@@ -80,21 +56,20 @@ public class Router implements HttpHandler {
    *
    * @param <T>         The instance type.
    * @param routesClass The routes class.
-   *
    * @return The instantiated routes class instance.
-   *
-   * @throws NoSuchMethodException
-   * @throws SecurityException
-   * @throws InvocationTargetException
-   * @throws InstantiationException
-   * @throws IllegalAccessException
+   * @throws NoSuchMethodException     if a programming error occurred whereby the method
+   *                                   does not exist
+   * @throws SecurityException         if `trySetAccessible` failed
+   * @throws InvocationTargetException if the router method invocation failed
+   * @throws InstantiationException    if the router class instantiation failed
+   * @throws IllegalAccessException    if `trySetAccessible` failed
    */
-  private static <T> T getRoutesClass(final Class<T> routesClass) throws
-    NoSuchMethodException,
-    SecurityException,
-    InvocationTargetException,
-    InstantiationException,
-    IllegalAccessException {
+  private <T> T getRoutesClass(final Class<T> routesClass) throws
+      NoSuchMethodException,
+      SecurityException,
+      InvocationTargetException,
+      InstantiationException,
+      IllegalAccessException {
     final String name = routesClass.getName();
 
     T instance = (T) routesClassCache.get(name);
@@ -114,6 +89,26 @@ public class Router implements HttpHandler {
   }
 
   /**
+   * Set the 404 Not Found fallback handler.
+   *
+   * @param handler A RouteHandler to be executed when no route match can be
+   *                found.
+   */
+  public void handleNotFoundWith(final RouteHandler handler) {
+    notFoundHandler = handler;
+  }
+
+  /**
+   * Set the 405 Method Not Allowed fallback handler.
+   *
+   * @param handler A RouteHandler to be executed when a route match was found but
+   *                not for the requested HTTP method.
+   */
+  public void handleMethodNotAllowedWith(final RouteHandler handler) {
+    methodNotAllowedHandler = handler;
+  }
+
+  /**
    * Implements the HttpHandler `handle` method. This allows the Router to be
    * passed directly into
    * the HttpServer.createContext method.
@@ -122,7 +117,7 @@ public class Router implements HttpHandler {
   public void handle(final HttpExchange exchange) throws IOException {
     final String path = exchange.getRequestURI().getPath();
     final SearchResult result = resolve(Method.valueOf(exchange.getRequestMethod()),
-      path);
+        path);
 
     final List<Middleware> mws = result.action().middlewares();
     RouteHandler handler = result.action().handler();
@@ -150,10 +145,8 @@ public class Router implements HttpHandler {
    * @param middlewares A list of middleware handlers that are invoked in
    *                    sequence. Each middleware
    *                    method must invoke the next handler in the sequence to
-   *                    continue on to the next
-   *                    middleware, or else it must handle and close the
-   *                    HttpExchange.
-   *
+   *                    continue on to the next middleware, or else it must
+   *                    handle and close the HttpExchange.
    * @implNote The route handler must implement the RouteHandler interface.
    * @implNote If provided a handler for an existing route (both path and method),
    * the existing handler will be overridden with the provided handler.
@@ -175,7 +168,6 @@ public class Router implements HttpHandler {
    * Non-annotated and inaccessible methods will be ignored.
    *
    * @param routesClass A class containing annotated route handlers.
-   *
    * @throws InvalidRouteClassException Unchecked RuntimeException.
    * @implNote If the provided class is an inner class, it must be static.
    * @implNote If provided a handler for an existing route (both path and method),
@@ -190,8 +182,8 @@ public class Router implements HttpHandler {
           final T instance = getRoutesClass(routesClass);
 
           final java.lang.reflect.Method maybeHandler = instance
-            .getClass()
-            .getDeclaredMethod(method.getName(), HttpExchange.class, RouteContext.class);
+              .getClass()
+              .getDeclaredMethod(method.getName(), HttpExchange.class, RouteContext.class);
 
           if (!maybeHandler.canAccess(instance) && !maybeHandler.trySetAccessible()) {
             // TODO: handle
@@ -212,12 +204,15 @@ public class Router implements HttpHandler {
           };
 
           register(
-            List.of(annotation.method()),
-            annotation.path(),
-            handler,
-            new ArrayList<>());
-        } catch (NoSuchMethodException | SecurityException | InvocationTargetException | InstantiationException |
-                 IllegalAccessException e) {
+              List.of(annotation.method()),
+              annotation.path(),
+              handler,
+              new ArrayList<>());
+        } catch (NoSuchMethodException
+                 | SecurityException
+                 | InvocationTargetException
+                 | InstantiationException
+                 | IllegalAccessException e) {
           throw new InvalidRouteClassException(e);
         }
       }
@@ -232,7 +227,6 @@ public class Router implements HttpHandler {
    *
    * @param method The HTTP method to search.
    * @param path   The path to search.
-   *
    * @return A SearchResult record.
    */
   private SearchResult resolve(final Method method, final String path) {
@@ -240,10 +234,10 @@ public class Router implements HttpHandler {
       return trie.search(method, path);
     } catch (NotFoundException e) {
       return new SearchResult(new Action(notFoundHandler, new ArrayList<>()),
-        new ArrayList<>());
+          new ArrayList<>());
     } catch (MethodNotAllowedException e) {
       return new SearchResult(new Action(methodNotAllowedHandler, new ArrayList<>()),
-        new ArrayList<>());
+          new ArrayList<>());
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

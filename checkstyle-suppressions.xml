@@ -1,24 +1,27 @@
 <?xml version="1.0"?>
 
 <!DOCTYPE suppressions PUBLIC
-     "-//Checkstyle//DTD SuppressionFilter Configuration 1.0//EN"
-     "https://checkstyle.org/dtds/suppressions_1_0.dtd">
+        "-//Checkstyle//DTD SuppressionFilter Configuration 1.0//EN"
+        "https://checkstyle.org/dtds/suppressions_1_0.dtd">
 
 <suppressions>
-  <suppress files="[\\/]example[\\/]" checks="[a-zA-Z0-9]*"/>
-  <suppress checks="VariableDeclarationUsageDistance"
-             files="Cors.java"
-             lines="190,191,192"/>
-  <suppress checks="MethodParamPad"
-             files="TestUtils.java"
-             lines="32"/>
-  <suppress checks="MethodParamPad"
-             files="CorsUtilsTest.java"
-             lines="23"/>
-  <suppress checks="MethodParamPad"
-             files="PathUtilsTest.java"
-             lines="16"/>
-  <suppress checks="LineLength"
-             files="ToStringTest.java"
-             lines="29"/>
+    <suppress files="[\\/]example[\\/]" checks="[a-zA-Z0-9]*"/>
+    <suppress checks="VariableDeclarationUsageDistance"
+              files="Cors.java"
+              lines="190,191,192"/>
+    <suppress checks="MethodParamPad"
+              files="TestUtils.java"
+              lines="32"/>
+    <suppress checks="MethodParamPad"
+              files="CorsUtilsTest.java"
+              lines="23"/>
+    <suppress checks="MethodParamPad"
+              files="PathUtilsTest.java"
+              lines="16"/>
+    <suppress checks="LineLength"
+              files="ToStringTest.java"
+              lines="29"/>
+    <suppress checks="JavadocTagContinuationIndentation"
+              files="Router.java"
+              lines="152,174"/>
 </suppressions>

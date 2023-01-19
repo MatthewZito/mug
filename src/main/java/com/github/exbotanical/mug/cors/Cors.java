@@ -5,7 +5,6 @@ import com.github.exbotanical.mug.constant.Status;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -160,7 +159,6 @@ public class Cors {
    *
    * @param handler A Router or HttpHandler intended to be used as the root context / handler for an
    *                HTTP server.
-   *
    * @return A modified HttpHandler wrapped in CORS processing logic.
    */
   public HttpHandler use(final HttpHandler handler) {
@@ -186,7 +184,6 @@ public class Cors {
    * Determines whether the given origin is allowed per the user-defined allow list.
    *
    * @param origin The request origin.
-   *
    * @return A boolean indicating whether the origin is allowed per the CORS impl.
    */
   public boolean isOriginAllowed(final String origin) {
@@ -209,7 +206,6 @@ public class Cors {
    * Determines whether the given method is allowed per the user-defined allow list.
    *
    * @param method The request method.
-   *
    * @return A boolean indicating whether the method is allowed per the CORS impl.
    */
   public boolean isMethodAllowed(final String method) {
@@ -236,7 +232,6 @@ public class Cors {
    *
    * @param headers The non-simple headers provided by the request via its
    *                Access-Control-Request-Headers header.
-   *
    * @return A boolean indicating whether the headers are allowed per the CORS impl.
    */
   public boolean areHeadersAllowed(final List<String> headers) {
@@ -394,11 +389,11 @@ public class Cors {
 
     List<String> exposeHeaders = new ArrayList<>();
 
-    boolean allowCredentials = false;
+    boolean allowCredentials;
 
-    boolean useOptionsPassthrough = false;
+    boolean useOptionsPassthrough;
 
-    int maxAge = 0;
+    int maxAge;
 
     Builder() {
     }
