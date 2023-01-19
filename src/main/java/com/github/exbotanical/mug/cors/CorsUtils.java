@@ -3,13 +3,18 @@ package com.github.exbotanical.mug.cors;
 import com.github.exbotanical.mug.constant.Method;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
+
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
  * Common utilities for use with CORS impl.
  */
 class CorsUtils {
+
+  private CorsUtils() {
+  }
 
   /**
    * Determine whether the given request satisfies the criteria of a Preflight request.
@@ -25,21 +30,21 @@ class CorsUtils {
    * </ul>
    *
    * @param exchange The HttpExchange containing the prospective Preflight request.
+   *
    * @return A boolean indicating whether the given request is a Preflight request.
    */
-  static boolean isPreflightRequest(HttpExchange exchange) {
-    boolean isOptionsReq = Method.OPTIONS.toString().equals(exchange.getRequestMethod());
+  static boolean isPreflightRequest(final HttpExchange exchange) {
+    final boolean isOptionsReq = Method.OPTIONS.toString().equals(exchange.getRequestMethod());
     if (!isOptionsReq) {
       return false;
     }
 
-    Headers reqHeaders = exchange.getRequestHeaders();
-    // @todo null safe
-    boolean hasOriginHeader =
-        NullSafe.getFirst(reqHeaders, CommonHeader.ORIGIN.value) != null;
-    // @todo null safe
-    boolean hasReqMethod =
-        NullSafe.getFirst(reqHeaders, CommonHeader.REQUEST_METHOD.value) != null;
+    final Headers reqHeaders = exchange.getRequestHeaders();
+    // TODO: box these - they cannot be null
+    final boolean hasOriginHeader =
+      NullSafe.getFirst(reqHeaders, CommonHeader.ORIGIN.value) != null;
+    final boolean hasReqMethod =
+      NullSafe.getFirst(reqHeaders, CommonHeader.REQUEST_METHOD.value) != null;
 
     return hasOriginHeader && hasReqMethod;
   }
@@ -48,20 +53,21 @@ class CorsUtils {
    * Extracts headers from a given request's Access-Control-Request-Headers header.
    *
    * @param exchange The HttpExchange containing the request.
+   *
    * @return A list of requested headers.
    */
-  static ArrayList<String> deriveHeaders(HttpExchange exchange) {
-    // @todo evaluate whether `getRequestHeaders` needs to be null-checked
-    String headersStr =
-        NullSafe.getFirst(exchange.getRequestHeaders(), CommonHeader.REQUEST_HEADERS.value);
-    ArrayList<String> headers = new ArrayList<>();
+  static List<String> deriveHeaders(final HttpExchange exchange) {
+    // TODO: evaluate whether `getRequestHeaders` needs to be null-checked
+    final String headersStr =
+      NullSafe.getFirst(exchange.getRequestHeaders(), CommonHeader.REQUEST_HEADERS.value);
+    final List<String> headers = new ArrayList<>();
 
     if (headersStr == null || "".equals(headersStr)) {
       return headers;
     }
 
-    int len = headersStr.length();
-    ArrayList<Character> tmp = new ArrayList<>();
+    final int len = headersStr.length();
+    final List<Character> tmp = new ArrayList<>();
 
     for (int i = 0; i < headersStr.length(); i++) {
       char c = headersStr.charAt(i);
@@ -77,8 +83,8 @@ class CorsUtils {
       if (c == ' ' || c == ',' || i == len - 1) {
         if (tmp.size() > 0) {
           String b = tmp.stream()
-              .map(e -> e.toString())
-              .collect(Collectors.joining());
+            .map(Object::toString)
+            .collect(Collectors.joining());
 
           headers.add(b);
 
@@ -89,6 +95,4 @@ class CorsUtils {
 
     return headers;
   }
-
-  private CorsUtils() {}
 }

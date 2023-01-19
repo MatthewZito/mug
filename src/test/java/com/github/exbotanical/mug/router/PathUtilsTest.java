@@ -2,7 +2,7 @@ package com.github.exbotanical.mug.router;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
@@ -13,18 +13,18 @@ import org.junit.jupiter.api.TestFactory;
  */
 @DisplayName("Test path utilities")
 class PathUtilsTest {
-  static record TestCase<T> (String name, String input, T expected) {
+  record TestCase<T> (String name, String input, T expected) {
 
   }
 
   @DisplayName("Test expandPath")
   @TestFactory
   Stream<DynamicTest> shouldExpandPath() {
-    ArrayList<TestCase<ArrayList<String>>> testInputs = TestUtils.toList(
-        new TestCase<>("BasicPath", "test", TestUtils.toList("test")),
-        new TestCase<>("NestedPath", "test/path", TestUtils.toList("test", "path")),
+    final List<TestCase<List<String>>> testInputs = List.of(
+        new TestCase<>("BasicPath", "test", List.of("test")),
+        new TestCase<>("NestedPath", "test/path", List.of("test", "path")),
         new TestCase<>("NestedPathTrailingSlash", "/some/test/path/",
-            TestUtils.toList("some", "test", "path")));
+            List.of("some", "test", "path")));
 
     return testInputs.stream()
         .map(testCase -> DynamicTest.dynamicTest(
@@ -37,7 +37,7 @@ class PathUtilsTest {
   @DisplayName("Test deriveLabelPattern")
   @TestFactory
   Stream<DynamicTest> shouldDeriveLabelPattern() {
-    ArrayList<TestCase<String>> testInputs = TestUtils.toList(
+    final List<TestCase<String>> testInputs = List.of(
         new TestCase<>("BasicRegex", ":id[^\\d+$]", "^\\d+$"),
         new TestCase<>("EmptyRegex", ":id[]", ""),
         new TestCase<>("NoRegex", ":id", "(.+)"),
@@ -55,7 +55,7 @@ class PathUtilsTest {
   @DisplayName("Test deriveParameterKey")
   @TestFactory
   Stream<DynamicTest> shouldDeriveParameterKey() {
-    ArrayList<TestCase<String>> testInputs = TestUtils.toList(
+    final List<TestCase<String>> testInputs = List.of(
         new TestCase<>("BasicKey", ":id[^\\d+$]", "id"),
         new TestCase<>("BasicKeyEmptyRegex", ":val[]", "val"),
         new TestCase<>("BasicKeyWildcardRegex", ":ex[(.*)]", "ex"),

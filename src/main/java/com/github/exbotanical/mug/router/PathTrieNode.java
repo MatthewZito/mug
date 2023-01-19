@@ -20,12 +20,12 @@ class PathTrieNode {
    * e.g. paths = /api/resource, /api/user root = api children { resource, user }
    * </p>
    */
-  Map<String, PathTrieNode> children;
+  final Map<String, PathTrieNode> children;
 
   /**
    * Actions associated with the path `label`.
    */
-  Map<Method, Action> actions;
+  final Map<Method, Action> actions;
 
   /**
    * PathTrieNode constructor.
@@ -34,8 +34,8 @@ class PathTrieNode {
    * @param children The node's children, represented as subsequent paths.
    * @param actions Actions associated with the path `label`.
    */
-  PathTrieNode(String label, Map<String, PathTrieNode> children,
-      Map<Method, Action> actions) {
+  PathTrieNode(final String label, final Map<String, PathTrieNode> children,
+      final Map<Method, Action> actions) {
     this.label = label;
     this.children = children;
     this.actions = actions;

@@ -6,7 +6,6 @@ import static com.github.exbotanical.mug.router.TestUtils.SearchQuery;
 import static com.github.exbotanical.mug.router.TestUtils.TestCase;
 import static com.github.exbotanical.mug.router.TestUtils.TestRoute;
 import static com.github.exbotanical.mug.router.TestUtils.TestRouter;
-import static com.github.exbotanical.mug.router.TestUtils.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.spy;
@@ -16,6 +15,7 @@ import static org.mockito.Mockito.verify;
 import com.github.exbotanical.mug.constant.Method;
 import com.sun.net.httpserver.HttpExchange;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -24,7 +24,7 @@ import org.junit.jupiter.api.TestFactory;
 
 @DisplayName("Test http router/multiplexer")
 class RouterTest {
-  TestRouter testRouter;
+  private static TestRouter testRouter;
 
   @BeforeEach
   void setUp() {
@@ -34,30 +34,30 @@ class RouterTest {
   @DisplayName("Test route class override")
   @TestFactory
   Stream<DynamicTest> shouldOverrideMethodsFromUse() {
-    RouteHandler testHandler = (exchange, context) -> {
+    final RouteHandler testHandler = (exchange, context) -> {
     };
 
-    RouteHandler testHandler2 = (exchange, context) -> {
+    final RouteHandler testHandler2 = (exchange, context) -> {
     };
 
-    RouteHandler testHandler3 = (exchange, context) -> {
+    final RouteHandler testHandler3 = (exchange, context) -> {
     };
 
-    RouteHandler testHandler4 = (exchange, context) -> {
+    final RouteHandler testHandler4 = (exchange, context) -> {
     };
 
-    ArrayList<RouteRecord> records = toList(
-        new RouteRecord("/", toList(Method.GET),
+    final List<RouteRecord> records = List.of(
+        new RouteRecord("/", List.of(Method.GET),
             testHandler),
-        new RouteRecord("/", toList(Method.POST), testHandler2),
-        new RouteRecord("/api", toList(Method.GET), testHandler3),
-        new RouteRecord("/dev/api", toList(Method.GET), testHandler4));
+        new RouteRecord("/", List.of(Method.POST), testHandler2),
+        new RouteRecord("/api", List.of(Method.GET), testHandler3),
+        new RouteRecord("/dev/api", List.of(Method.GET), testHandler4));
 
     testRouter.use(TestRoute.class);
 
-    PathTrie trie = testRouter.getTrie();
+    final PathTrie trie = testRouter.getTrie();
 
-    ArrayList<TestCase<SearchResult>> testCases = toList(
+    final List<TestCase<SearchResult>> testCases = List.of(
         new TestCase<>(
             "OverrideRootHandler",
             new SearchQuery(Method.GET, "/"),
@@ -86,7 +86,7 @@ class RouterTest {
                 new Action(testHandler4, new ArrayList<>()),
                 new ArrayList<>())));
 
-    for (RouteRecord record : records) {
+    for (final RouteRecord record : records) {
       testRouter.register(
           record.methods(),
           record.path(),
@@ -106,9 +106,9 @@ class RouterTest {
   @DisplayName("Test correct route handler is matched and invoke upon request receipt")
   @TestFactory
   Stream<DynamicTest> shouldMatchAndInvokeRegisteredRoutes() {
-    TestRouter testRouter = new TestRouter();
+    final TestRouter testRouter = new TestRouter();
 
-    ArrayList<TestCase<?>> testCases = toList(
+    final List<TestCase<?>> testCases = List.of(
         new TestCase<>(
             "InvokeRootHandler",
             new SearchQuery(Method.GET, "/"), null),
@@ -133,26 +133,27 @@ class RouterTest {
             testCase.name(),
             () -> {
               // Grab the query details.
-              SearchQuery query = testCase.input();
+              final SearchQuery query = testCase.input();
 
               // Initialize a route handler spy. We'll test whether this was actually
               // invoked when the router receives a mock request.
-              RouteHandler handlerSpy = spy(RouteHandler.class);
+              final RouteHandler handlerSpy = spy(RouteHandler.class);
               // Generate the mock HttpExchange. This represents an HTTP request that
               // will match the expected path and method.
-              HttpExchange exchangeMock =
+              final HttpExchange exchangeMock =
                   ExchangeMockFactory.build("http://test.com" + query.path(),
                       query.method());
 
               try {
                 // Register the route using the handler spy.
                 testRouter.register(
-                    toList(query.method()),
+                    List.of(query.method()),
                     query.path(),
                     handlerSpy,
                     new ArrayList<>());
 
                 // Invoke the handler with the mock request.
+                assert exchangeMock != null;
                 testRouter.handle(exchangeMock);
                 // Assert the matched handler was resolved and invoked.
                 verify(handlerSpy, times(1)).handle(exchangeMock,

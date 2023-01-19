@@ -15,19 +15,19 @@ class ToStringTest {
   @DisplayName("Test Cors.toString")
   @Test
   void shouldPrettyStringifyCors() {
-    Cors c = new Cors.Builder()
+    final Cors c = new Cors.Builder()
         .allowCredentials(true)
         .allowedHeaders("header-1")
         .allowedMethods(Method.GET, Method.PATCH)
         .allowedOrigins("*")
         .exposeHeaders("X-Powered-By")
-        .maxAge(36000)
         .useOptionsPassthrough(true)
+        .maxAge(36000)
         .build();
 
-    String expected =
-        "Cors {\n  allowedOrigins: []\n  allowedMethods: [GET, PATCH]\n  allowedHeaders: [header-1]\n  exposedHeaders: [X-Powered-By]\n  allowCredentials: true\n  allowAllOrigins: true\n  allowAllHeaders: false\n  useOptionsPassthrough: true\n  maxAge: 36000\n}";
-    String actual = c.toString();
+    final String expected =
+        "Cors {\n  allowedOrigins: []\n  allowedMethods: [GET, PATCH]\n  allowedHeaders: [header-1]\n  exposedHeaders: [X-Powered-By]\n  allowCredentials: true\n  useOptionsPassthrough: true\n  maxAge: 36000\n  allowAllOrigins: true\n  allowAllHeaders: false\n}";
+    final String actual = c.toString();
 
     assertEquals(expected, actual);
   }

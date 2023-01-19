@@ -8,5 +8,5 @@ import com.sun.net.httpserver.HttpExchange;
  */
 @FunctionalInterface
 public interface AuthenticationMiddleware {
-  public boolean handle(HttpExchange exchange);
+  public boolean handle(final HttpExchange exchange);
 }

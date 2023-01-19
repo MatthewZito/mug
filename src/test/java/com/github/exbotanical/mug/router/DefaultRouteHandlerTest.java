@@ -2,7 +2,6 @@ package com.github.exbotanical.mug.router;
 
 import static com.github.exbotanical.mug.router.TestUtils.ExchangeMockFactory;
 import static com.github.exbotanical.mug.router.TestUtils.TestRouter;
-import static com.github.exbotanical.mug.router.TestUtils.toList;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.spy;
@@ -13,13 +12,15 @@ import com.github.exbotanical.mug.constant.Method;
 import com.github.exbotanical.mug.constant.Status;
 import com.sun.net.httpserver.HttpExchange;
 import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 @DisplayName("Test default route handlers")
 class DefaultRouteHandlerTest {
-  TestRouter testRouter;
+  static TestRouter testRouter;
 
   @BeforeEach
   void setUp() {
@@ -30,8 +31,9 @@ class DefaultRouteHandlerTest {
   @Test
   void shouldInvokeDefaultNotFoundHandler() {
     try {
-      HttpExchange exchangeMock = ExchangeMockFactory.build("http://test.com/api", Method.GET);
+      final HttpExchange exchangeMock = ExchangeMockFactory.build("http://test.com/api", Method.GET);
 
+      assert exchangeMock != null;
       testRouter.handle(exchangeMock);
 
       verify(exchangeMock, atLeastOnce())
@@ -45,11 +47,12 @@ class DefaultRouteHandlerTest {
   @Test
   void shouldInvokeDefaultMethodNotAllowedHandler() {
     try {
-      RouteHandler handler = (exchange, context) -> {
+      final RouteHandler handler = (exchange, context) -> {
       };
-      testRouter.register(toList(Method.GET), "/api", handler, new ArrayList<>());
+      testRouter.register(List.of(Method.GET), "/api", handler, new ArrayList<>());
 
       HttpExchange exchangeMock = ExchangeMockFactory.build("http://test.com/api", Method.POST);
+      assert exchangeMock != null;
       testRouter.handle(exchangeMock);
 
       verify(exchangeMock, atLeastOnce())
@@ -62,15 +65,13 @@ class DefaultRouteHandlerTest {
   @DisplayName("Test Router invokes Not Found handler")
   @Test
   void shouldInvokeNotFoundHandler() {
-    RouteHandler notFoundSpy = spy(RouteHandler.class);
-    RouteHandler notFoundHandler = (exchange, context) -> {
-      notFoundSpy.handle(exchange, context);
-    };
+    final RouteHandler notFoundSpy = spy(RouteHandler.class);
 
-    testRouter.handleNotFoundWith(notFoundHandler);
+    testRouter.handleNotFoundWith(notFoundSpy);
 
     try {
-      HttpExchange exchangeMock = ExchangeMockFactory.build("http://test.com/api", Method.GET);
+      final HttpExchange exchangeMock = ExchangeMockFactory.build("http://test.com/api", Method.GET);
+      assert exchangeMock != null;
       testRouter.handle(exchangeMock);
 
       verify(
@@ -86,18 +87,16 @@ class DefaultRouteHandlerTest {
   @DisplayName("Test Router invokes Method Not Allowed handler")
   @Test
   void shouldInvokeMethodNotAllowedHandler() {
-    RouteHandler notAllowedSpy = spy(RouteHandler.class);
-    RouteHandler notAllowedHandler = (exchange, context) -> {
-      notAllowedSpy.handle(exchange, context);
-    };
-    RouteHandler handler = (exchange, context) -> {
+    final RouteHandler notAllowedSpy = spy(RouteHandler.class);
+    final RouteHandler handler = (exchange, context) -> {
     };
 
-    testRouter.handleMethodNotAllowedWith(notAllowedHandler);
-    testRouter.register(toList(Method.GET), "/api", handler, new ArrayList<>());
+    testRouter.handleMethodNotAllowedWith(notAllowedSpy);
+    testRouter.register(List.of(Method.GET), "/api", handler, new ArrayList<>());
 
     try {
-      HttpExchange exchangeMock = ExchangeMockFactory.build("http://test.com/api", Method.POST);
+      final HttpExchange exchangeMock = ExchangeMockFactory.build("http://test.com/api", Method.POST);
+      assert exchangeMock != null;
       testRouter.handle(exchangeMock);
 
       verify(

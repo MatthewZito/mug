@@ -11,10 +11,10 @@ class RegexCacheTest {
   @DisplayName("Test RegexCache")
   @Test
   void shouldCachePattern() {
-    RegexCache cache = new RegexCache();
+    final RegexCache cache = new RegexCache();
 
-    String pattern1 = "(.*)";
-    String pattern2 = "^\\d+$";
+    final String pattern1 = "(.*)";
+    final String pattern2 = "^\\d+$";
 
     // Must ensure retrieval is executed directly on cache state, otherwise we will
     // incite a cache op.

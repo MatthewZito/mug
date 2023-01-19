@@ -1,15 +1,14 @@
 package com.github.exbotanical.mug.router;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A context object containing any matched parameters for the route.
  */
-public record RouteContext(ArrayList<Parameter> params) {
+public record RouteContext(List<Parameter> params) {
 
   @Override
   public String toString() {
-    String out = String.format("RouteContext { params: %s }", params);
-    return out;
+    return String.format("RouteContext { params: %s }", params);
   }
 }
