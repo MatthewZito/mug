@@ -5,6 +5,7 @@ import com.github.exbotanical.mug.constant.Path;
 import com.github.exbotanical.mug.router.errors.MethodNotAllowedException;
 import com.github.exbotanical.mug.router.errors.NotFoundException;
 import com.github.exbotanical.mug.router.middleware.Middleware;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,32 +26,37 @@ class PathTrie {
    */
   private final RegexCache cache;
 
+  private final HashMap<PathHashKey, SearchResult> pathCache;
+
   PathTrie() {
-    this.root = new PathTrieNode("", new HashMap<>(), new HashMap<>());
-    this.cache = new RegexCache();
+    root = new PathTrieNode("", new HashMap<>(), new HashMap<>());
+    cache = new RegexCache();
+    pathCache = new HashMap<>();
   }
 
   /**
    * Insert a new route record into the PathTrie.
    *
    * @param methods A list of the HTTP methods to which the handler should be correlated.
-   * @param path The path at which this record will match.
+   * @param path    The path at which this record will match.
    * @param handler The RouteHandler function to be invoked upon a routing match to the given path
-   *        `path`.
+   *                `path`.
    */
   void insert(final List<Method> methods, final String path, final RouteHandler handler,
               final List<Middleware> middlewares) {
     // Handle root path registration.
     if (Path.ROOT.value.equals(path)) {
-      this.root.label = path;
+      root.label = path;
       methods.forEach(method -> {
-        this.root.actions.put(method, new Action(handler, middlewares));
+        final PathHashKey hashKey = new PathHashKey(path, method.name());
+        pathCache.remove(hashKey);
+        root.actions.put(method, new Action(handler, middlewares));
       });
 
       return;
     }
 
-    PathTrieNode curr = this.root;
+    PathTrieNode curr = root;
 
     final List<String> paths = PathUtils.expandPath(path);
     for (int i = 0; i < paths.size(); i++) {
@@ -69,30 +75,39 @@ class PathTrie {
         curr.label = paths.get(i);
 
         for (final Method method : methods) {
+          final PathHashKey hashKey = new PathHashKey(path, method.name());
+          pathCache.remove(hashKey);
+
           curr.actions.put(method, new Action(handler, middlewares));
         }
 
         break;
       }
     }
-
   }
 
   /**
    * Search for a route record at the provided HTTP method and search path.
    *
-   * @param method The HTTP method for the matching route record.
+   * @param method     The HTTP method for the matching route record.
    * @param searchPath The path to search.
+   *
    * @return A SearchResult record containing the matched route handler and any matching parameters.
-   * @throws NotFoundException A route match was not found.
+   *
+   * @throws NotFoundException         A route match was not found.
    * @throws MethodNotAllowedException A route match was found, but not for the specified HTTP
-   *         method.
+   *                                   method.
    */
   SearchResult search(final Method method, final String searchPath)
-      throws NotFoundException, MethodNotAllowedException {
+    throws NotFoundException, MethodNotAllowedException {
+    final PathHashKey hashKey = new PathHashKey(searchPath, method.name());
+    if (pathCache.containsKey(new PathHashKey(searchPath, method.name()))) {
+      return pathCache.get(hashKey);
+    }
+
     final List<Parameter> params = new ArrayList<>();
 
-    PathTrieNode curr = this.root;
+    PathTrieNode curr = root;
 
     for (final String path : PathUtils.expandPath(searchPath)) {
       final PathTrieNode next = curr.children.get(path);
@@ -114,7 +129,7 @@ class PathTrie {
         // is delimiter
         if (Path.PARAMETER_DELIMITER.value.equals(String.valueOf(childKey.charAt(0)))) {
           final String pattern = PathUtils.deriveLabelPattern(childKey);
-          final Pattern regex = this.cache.get(pattern);
+          final Pattern regex = cache.get(pattern);
 
           if (regex.matcher(path).matches()) {
             String param = PathUtils.deriveParameterKey(childKey);
@@ -135,7 +150,6 @@ class PathTrie {
       // No parameter match.
       if (!isParamMatch) {
         throw new NotFoundException("No parameter match");
-
       }
     }
 
@@ -152,6 +166,8 @@ class PathTrie {
       throw new MethodNotAllowedException("No matching handler");
     }
 
-    return new SearchResult(matchedAction, params);
+    final SearchResult searchResult = new SearchResult(matchedAction, params);
+    pathCache.put(hashKey, searchResult);
+    return searchResult;
   }
 }

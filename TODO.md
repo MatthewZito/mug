@@ -8,3 +8,4 @@
 - [x] cache auto routes instance
 - [ ] use varargs where possible
 - [ ] make interfaces package-private where possible
+- [ ] run race cond tests using threads

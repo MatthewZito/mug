@@ -103,7 +103,7 @@ public class Router implements HttpHandler {
       Constructor<T> constructor = routesClass.getDeclaredConstructor();
 
       if (!constructor.trySetAccessible()) {
-        System.out.println("no workie");
+        throw new IllegalAccessException("cannot access class " + name);
       }
 
       instance = constructor.newInstance();
